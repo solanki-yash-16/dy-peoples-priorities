@@ -1,3 +1,55 @@
-node_modules
+# ─── Dependencies ─────────────────────────────────────────
+node_modules/
 
-.env**
+# ─── Turborepo ────────────────────────────────────────────
+.turbo/
+
+# ─── Build output ─────────────────────────────────────────
+dist/
+build/
+.next/
+out/
+
+# ─── Environment variables ────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── Logs ─────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ─── OS files ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ─── IDE / Editor ─────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─── Testing / Coverage ──────────────────────────────────
+coverage/
+
+# ─── TypeScript ───────────────────────────────────────────
+*.tsbuildinfo
+
+# ─── Misc ─────────────────────────────────────────────────
+*.local
+*.pem
+
+# ─── Sub-project lockfiles (only root pnpm-lock.yaml matters) ─
+apps/*/pnpm-lock.yaml
+packages/*/pnpm-lock.yaml
+packages/pnpm-lock.yaml
