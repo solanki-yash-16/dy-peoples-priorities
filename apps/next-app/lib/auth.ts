@@ -1,6 +1,6 @@
 export const STATIC_CREDENTIALS = {
   username: "admin",
-  password: "admin123",
+  password: "Admin@123",
 } as const;
 
 export function verifyCredentials(username: string, password: string): boolean {
