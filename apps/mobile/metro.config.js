@@ -1,11 +1,26 @@
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const path = require('path');
 
-/**
- * Metro configuration
- * https://reactnative.dev/docs/metro
- *
- * @type {import('@react-native/metro-config').MetroConfig}
- */
-const config = {};
+const projectRoot = __dirname;
+const monorepoRoot = path.resolve(projectRoot, '../..');
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+const config = {
+  projectRoot,
+  watchFolders: [monorepoRoot],
+  resolver: {
+    resolveRequestParams: {
+      root: projectRoot,
+    },
+    extraNodeModules: new Proxy(
+      {},
+      {
+        get: (target, name) => {
+          if (name[0] === '$') return;
+          return path.resolve(projectRoot, 'node_modules', name);
+        },
+      },
+    ),
+  },
+};
+
+module.exports = mergeConfig(getDefaultConfig(projectRoot), config);
