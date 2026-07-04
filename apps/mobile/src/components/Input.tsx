@@ -37,7 +37,7 @@ export const Input: React.FC<InputProps> = ({
   placeholder,
   value,
   onChangeText,
-  variant = "default",
+  // variant = "default",
   size = "md",
   error,
   disabled = false,
