@@ -1,4 +1,4 @@
-﻿# 🗳️ DY Peoples Priorities
+# 🗳️ DY Peoples Priorities
 
 > A full-stack monorepo platform built for the **HackToSkill · Build with AI** hackathon — empowering communities to voice, prioritize, and track the issues that matter most to them.
 
@@ -36,6 +36,23 @@ dy-peoples-priorities/
 | **Web App** | Vite · React · Vanilla CSS |
 | **Mobile** | React Native (bare workflow) |
 | **Shared UI** | `@repo/ui` — shared component library |
+
+---
+
+## ✨ Key Features
+
+- **Advanced Complaint Submission (Next.js)**: 
+  - Integrated Voice Recording & Playback (MediaRecorder API).
+  - Drag & Drop Multiple Image Uploads with compression (Firebase Storage).
+  - Auto Location Capture & Reverse Geocoding via Google Maps.
+  - Beautiful, Responsive UI with Tailwind CSS, Shadcn, & Framer Motion.
+  - Robust form validation with React Hook Form & Zod.
+- **Robust Backend API (Express + TypeScript)**:
+  - Repository Pattern architecture following SOLID principles.
+  - Advanced querying (filtering by location, status, date ranges, priority).
+  - Geo-spatial Heatmap & Statistics aggregation endpoints.
+  - Full OpenAPI 3.0 (Swagger) Documentation across all modules.
+- **Authentication & Security**: JWT-based auth with HTTP-only cookies and bcrypt hashing.
 
 ---
 
@@ -132,6 +149,25 @@ http://localhost:5000/api/v1
 | `PUT` | `/:id` | Private 🔒 | Update a user's details |
 | `DELETE` | `/:id` | Private 🔒 | Delete a user |
 
+### Complaint Endpoints — `/api/v1/complaints`
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/` | Private 🔒 | Create a new complaint (with location & media) |
+| `GET` | `/` | Private 🔒 | Get all complaints (with filtering, pagination, sorting) |
+| `GET` | `/:id` | Private 🔒 | Get complaint by ID |
+| `PATCH` | `/:id/status` | Private 🔒 | Update complaint status |
+| `GET` | `/stats/summary` | Private 🔒 | Get aggregate statistics (by status, category, priority) |
+| `GET` | `/stats/heatmap` | Private 🔒 | Get geo-location heatmap data |
+
+### Location & Upload Endpoints
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/v1/location/reverse-geocode` | Private 🔒 | Reverse geocode coordinates to an address |
+| `POST` | `/api/v1/uploads/image` | Private 🔒 | Upload an image file |
+| `POST` | `/api/v1/uploads/audio` | Private 🔒 | Upload an audio file |
+
 ### Authentication
 
 The API uses **JWT Bearer tokens**. Pass the token in the `Authorization` header:
@@ -178,7 +214,10 @@ apps/backend/src/
 │   └── User.ts              # Mongoose User schema (bcrypt pre-save hook)
 ├── routes/
 │   ├── auth.routes.ts       # Auth route definitions + Swagger JSDoc
-│   └── user.routes.ts       # User route definitions + Swagger JSDoc
+│   ├── user.routes.ts       # User route definitions + Swagger JSDoc
+│   ├── complaint.routes.ts  # Complaint route definitions
+│   ├── location.routes.ts   # Reverse geocoding routes
+│   └── upload.routes.ts     # Media upload routes
 └── index.ts                 # Express app entry point
 ```
 
