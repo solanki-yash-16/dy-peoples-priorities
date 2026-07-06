@@ -2,8 +2,10 @@ packages:
   - "apps/*"
   - "packages/*"
 allowBuilds:
+  '@firebase/util': true
   '@scarf/scarf': true
   bcrypt: true
   esbuild: true
+  protobufjs: false
   sharp: true
   unrs-resolver: true

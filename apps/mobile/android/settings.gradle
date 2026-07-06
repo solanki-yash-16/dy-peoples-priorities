@@ -1,6 +1,24 @@
 pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
 plugins { id("com.facebook.react.settings") }
-extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+
+import org.gradle.internal.os.OperatingSystem
+
+def pnpmBin = "pnpm"
+
+def isWindows = OperatingSystem.current().isWindows()
+def cliCommand = isWindows
+  ? [pnpmBin, "exec", "rnc-cli", "config"]
+  : ["sh", "-c", "unset npm_config_argv npm_config_global npm_config_local; " + pnpmBin + " exec rnc-cli config"]
+
+def workingDir = settings.layout.rootDirectory.dir("../").asFile
+def lockFiles = settings.layout.rootDirectory
+  .dir("../")
+  .files("pnpm-lock.yaml", "yarn.lock", "package-lock.json", "package.json", "react-native.config.js")
+
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex ->
+  ex.autolinkLibrariesFromCommand(cliCommand, workingDir, lockFiles)
+}
+
 rootProject.name = 'mobile'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
