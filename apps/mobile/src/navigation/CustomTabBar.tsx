@@ -1,53 +1,61 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Spacing, Typography } from '../theme/index';
+import type { MainTabParamList } from './types';
 
-export const CustomTabBar: React.FC<BottomTabBarProps> = ({
-  state,
-  navigation,
-}) => {
+export const tabBarHeight = 52;
+
+type Route = keyof MainTabParamList;
+
+const icons: Record<Route, string> = {
+  Home: '🏠',
+  Themes: '🏷️',
+  Submissions: '📋',
+  Hotspots: '🔥',
+  Rankings: '🏆',
+  Insights: '💡',
+  Profile: '👤',
+};
+
+const labels: Record<Route, string> = {
+  Home: 'Home',
+  Themes: 'Themes',
+  Submissions: 'Submissions',
+  Hotspots: 'Hotspots',
+  Rankings: 'Rankings',
+  Insights: 'Insights',
+  Profile: 'Profile',
+};
+
+type TopTabBarProps = {
+  navigation: BottomTabNavigationProp<MainTabParamList>;
+};
+
+export const TopTabBar: React.FC<TopTabBarProps> = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
+  const state = navigation.getState();
+  const currentTab = state.routeNames[state.index ?? 0] as Route;
+
   return (
-    <View style={styles.container}>
-      <View style={styles.tabBar}>
-        {state.routes.map((route, index) => {
-          const isFocused = state.index === index;
-
-          const icons: Record<string, string> = {
-            Home: '🏠',
-            Themes: '🏷️',
-            Submissions: '📋',
-            Hotspots: '🔥',
-            Rankings: '🏆',
-            Insights: '💡',
-            Profile: '👤',
-          };
-
-          const labels: Record<string, string> = {
-            Home: 'Home',
-            Themes: 'Themes',
-            Submissions: 'Submissions',
-            Hotspots: 'Hotspots',
-            Rankings: 'Rankings',
-            Insights: 'Insights',
-            Profile: 'Profile',
-          };
+    <View style={[styles.container, { paddingLeft: insets.left, paddingRight: insets.right }]}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        {(Object.keys(labels) as Route[]).map((route) => {
+          const isFocused = currentTab === route;
 
           const onPress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
-            }
+            navigation.navigate(route);
           };
 
           return (
             <TouchableOpacity
-              key={route.key}
+              key={route}
               activeOpacity={0.7}
               onPress={onPress}
               style={styles.tab}
@@ -57,8 +65,9 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({
                   styles.icon,
                   isFocused ? styles.iconFocused : styles.iconInactive,
                 ]}
+                numberOfLines={1}
               >
-                {icons[route.name]}
+                {icons[route]}
               </Text>
               <Text
                 style={[
@@ -67,52 +76,48 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({
                 ]}
                 numberOfLines={1}
               >
-                {labels[route.name]}
+                {labels[route]}
               </Text>
-              {isFocused && <View style={styles.indicator} />}
+              {isFocused ? <View style={styles.indicator} /> : null}
             </TouchableOpacity>
           );
         })}
-      </View>
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: Colors.white,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.border,
     shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
-    elevation: 8,
-  },
-  tabBar: {
+    elevation: 2,
+    height: tabBarHeight,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
-    height: 64,
-    paddingHorizontal: Spacing.xs,
-    paddingBottom: Spacing.xs,
+  },
+  scrollContent: {
+    alignItems: 'center',
+    paddingHorizontal: Spacing.sm,
+    columnGap: Spacing.xs,
   },
   tab: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    width: 72,
     height: '100%',
     position: 'relative',
-    gap: Spacing.xs,
+    gap: Spacing.xs / 2,
   },
   icon: {
-    fontSize: 22,
-    height: 24,
-    lineHeight: 24,
+    fontSize: 20,
+    height: 22,
+    lineHeight: 22,
   },
   iconFocused: {
     opacity: 1,
@@ -125,6 +130,8 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.medium,
     height: 14,
     lineHeight: 14,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   labelFocused: {
     color: Colors.accent,
@@ -134,12 +141,12 @@ const styles = StyleSheet.create({
   },
   indicator: {
     position: 'absolute',
-    top: 0,
-    left: '25%',
-    right: '25%',
+    bottom: 0,
+    left: '20%',
+    right: '20%',
     height: 3,
     backgroundColor: Colors.accent,
-    borderBottomLeftRadius: 3,
-    borderBottomRightRadius: 3,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
   },
 });

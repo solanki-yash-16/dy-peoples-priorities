@@ -16,8 +16,10 @@ import {
   mockHotspots,
 } from '../../utils/mockData';
 import { Card } from '../../components/Card';
+import { TopTabBar } from '../../navigation/CustomTabBar';
 import { categoryColors, sentimentColors } from '../../utils/mockData';
 import { FloatingActionButton } from '../../components/FloatingActionButton';
+import { useAuthStore } from '../../store/authStore';
 const { width } = Dimensions.get('window');
 
 interface StatCardProps {
@@ -47,6 +49,7 @@ interface HomeScreenProps {
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const { user } = useAuthStore();
   const recentSubmissions = mockSubmissions.slice(0, 3);
   const topRankings = mockRankings.slice(0, 2);
 
@@ -61,6 +64,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <TopTabBar navigation={navigation} />
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
@@ -69,10 +73,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>Welcome back,</Text>
-            <Text style={styles.title}>MP Admin</Text>
+            <Text style={styles.title}>{user?.name || 'User'}</Text>
           </View>
           <TouchableOpacity style={styles.avatar}>
-            <Text style={styles.avatarText}>A</Text>
+            <Text style={styles.avatarText}>{user?.name?.[0]?.toUpperCase() || 'U'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -275,6 +279,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.md,
+    // paddingTop: tabBarHeight + Spacing.md,
     paddingBottom: Spacing.tabBar,
   },
   header: {
@@ -318,7 +323,7 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
     color: Colors.text,
-    marginBottom: 10
+    marginBottom: 10,
   },
   seeAll: {
     fontSize: Typography.sizes.sm,

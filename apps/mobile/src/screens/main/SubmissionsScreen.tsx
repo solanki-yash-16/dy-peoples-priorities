@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-nati
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors, Spacing, BorderRadius, Typography } from "../../theme";
 import { Card } from "../../components/Card";
+import { TopTabBar } from "../../navigation/CustomTabBar";
 import { mockSubmissions, sentimentColors, categoryColors } from "../../utils/mockData";
 
 type SubmissionsScreenProps = {
@@ -29,6 +30,7 @@ export const SubmissionsScreen: React.FC<SubmissionsScreenProps> = ({ navigation
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
+      <TopTabBar navigation={navigation} />
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
@@ -117,6 +119,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.md,
+    // paddingTop: tabBarHeight + Spacing.md,
     paddingBottom: Spacing.tabBar,
   },
   title: {

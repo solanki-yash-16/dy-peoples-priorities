@@ -1,15 +1,18 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
 import { Card } from '../../components/Card';
+import { TopTabBar } from '../../navigation/CustomTabBar';
+import { useAuth } from '../../hooks/useAuth';
 
 interface ProfileScreenProps {
   navigation: any;
@@ -17,6 +20,8 @@ interface ProfileScreenProps {
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const scrollRef = useRef<ScrollView>(null);
+  const { logout, user } = useAuth();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -27,6 +32,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <TopTabBar navigation={navigation} />
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
@@ -34,11 +40,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       >
         <View style={styles.header}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>A</Text>
+            <Text style={styles.avatarText}>{user?.name?.[0]?.toUpperCase() || 'U'}</Text>
           </View>
-          <Text style={styles.name}>MP Admin</Text>
-          <Text style={styles.role}>Administrator</Text>
-          <Text style={styles.constituency}>North Constituency</Text>
+          <Text style={styles.name}>{user?.name || 'User'}</Text>
+          <Text style={styles.role}>{user?.role || 'user'}</Text>
+          <Text style={styles.constituency}>{user?.email || ''}</Text>
         </View>
 
         <View style={styles.statsContainer}>
@@ -71,14 +77,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 style={styles.menuItem}
                 onPress={() => {
                   if (item.label === 'Logout') {
-                    Alert.alert('Logout', 'Are you sure you want to logout?', [
-                      { text: 'Cancel', style: 'cancel' },
-                      {
-                        text: 'Logout',
-                        style: 'destructive',
-                        onPress: () => navigation.replace('Login'),
-                      },
-                    ]);
+                    setShowLogoutModal(true);
                   }
                 }}
               >
@@ -103,6 +102,43 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           <Text style={styles.footerText}>MP Citizen Dashboard v1.0</Text>
           <Text style={styles.footerSubtext}>Built with React Native</Text>
         </View>
+
+        <Modal
+          visible={showLogoutModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowLogoutModal(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setShowLogoutModal(false)}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Logout</Text>
+                  <Text style={styles.modalMessage}>
+                    Are you sure you want to logout?
+                  </Text>
+                  <View style={styles.modalActions}>
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => setShowLogoutModal(false)}
+                    >
+                      <Text style={styles.modalCancelText}>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => {
+                        setShowLogoutModal(false);
+                        logout();
+                      }}
+                    >
+                      <Text style={styles.modalConfirmText}>Logout</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
   );
@@ -115,6 +151,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.md,
+    // paddingTop: tabBarHeight + Spacing.md,
     paddingBottom: Spacing.tabBar,
   },
   header: {
@@ -221,5 +258,49 @@ const styles = StyleSheet.create({
   footerSubtext: {
     fontSize: Typography.sizes.xs,
     color: Colors.textMuted,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.xl,
+  },
+  modalContent: {
+    backgroundColor: Colors.white,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.lg,
+    width: '100%',
+    maxWidth: 320,
+  },
+  modalTitle: {
+    fontSize: Typography.sizes.lg,
+    fontWeight: Typography.weights.bold,
+    color: Colors.text,
+    marginBottom: Spacing.sm,
+  },
+  modalMessage: {
+    fontSize: Typography.sizes.md,
+    color: Colors.textSecondary,
+    marginBottom: Spacing.lg,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: Spacing.md,
+  },
+  modalButton: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  modalCancelText: {
+    fontSize: Typography.sizes.md,
+    color: Colors.textSecondary,
+    fontWeight: Typography.weights.medium,
+  },
+  modalConfirmText: {
+    fontSize: Typography.sizes.md,
+    color: Colors.error,
+    fontWeight: Typography.weights.semibold,
   },
 });

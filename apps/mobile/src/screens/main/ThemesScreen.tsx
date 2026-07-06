@@ -1,9 +1,10 @@
-import React, { useRef, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Colors, Spacing, BorderRadius, Typography } from "../../theme";
-import { Card } from "../../components/Card";
-import { mockThemes } from "../../utils/mockData";
+import React, { useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
+import { Card } from '../../components/Card';
+import { TopTabBar } from '../../navigation/CustomTabBar';
+import { mockThemes } from '../../utils/mockData';
 
 interface ThemesScreenProps {
   navigation: any;
@@ -13,14 +14,15 @@ export const ThemesScreen: React.FC<ThemesScreenProps> = ({ navigation }) => {
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
+    const unsubscribe = navigation.addListener('focus', () => {
       scrollRef.current?.scrollTo({ y: 0, animated: false });
     });
     return unsubscribe;
   }, [navigation]);
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <TopTabBar navigation={navigation} />
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
@@ -32,7 +34,7 @@ export const ThemesScreen: React.FC<ThemesScreenProps> = ({ navigation }) => {
         </Text>
 
         <View style={styles.list}>
-          {mockThemes.map((theme) => (
+          {mockThemes.map(theme => (
             <Card key={theme.id} style={styles.card}>
               <View style={styles.cardHeader}>
                 <View style={styles.titleContainer}>
@@ -42,24 +44,28 @@ export const ThemesScreen: React.FC<ThemesScreenProps> = ({ navigation }) => {
                 <View
                   style={[
                     styles.trendBadge,
-                    theme.trend === "up"
-                      ? { backgroundColor: Colors.error + "15" }
-                      : theme.trend === "down"
-                        ? { backgroundColor: Colors.success + "15" }
-                        : { backgroundColor: Colors.slate[200] },
+                    theme.trend === 'up'
+                      ? { backgroundColor: Colors.error + '15' }
+                      : theme.trend === 'down'
+                      ? { backgroundColor: Colors.success + '15' }
+                      : { backgroundColor: Colors.slate[200] },
                   ]}
                 >
                   <Text
                     style={[
                       styles.trendText,
-                      theme.trend === "up"
+                      theme.trend === 'up'
                         ? { color: Colors.error }
-                        : theme.trend === "down"
-                          ? { color: Colors.success }
-                          : { color: Colors.textSecondary },
+                        : theme.trend === 'down'
+                        ? { color: Colors.success }
+                        : { color: Colors.textSecondary },
                     ]}
                   >
-                    {theme.trend === "up" ? "↑ Rising" : theme.trend === "down" ? "↓ Falling" : "→ Stable"}
+                    {theme.trend === 'up'
+                      ? '↑ Rising'
+                      : theme.trend === 'down'
+                      ? '↓ Falling'
+                      : '→ Stable'}
                   </Text>
                 </View>
               </View>
@@ -73,10 +79,15 @@ export const ThemesScreen: React.FC<ThemesScreenProps> = ({ navigation }) => {
                   <Text
                     style={[
                       styles.statValue,
-                      { color: theme.avgSentiment < 0 ? Colors.error : Colors.success },
+                      {
+                        color:
+                          theme.avgSentiment < 0
+                            ? Colors.error
+                            : Colors.success,
+                      },
                     ]}
                   >
-                    {theme.avgSentiment > 0 ? "+" : ""}
+                    {theme.avgSentiment > 0 ? '+' : ''}
                     {theme.avgSentiment.toFixed(1)}
                   </Text>
                   <Text style={styles.statLabel}>Sentiment</Text>
@@ -122,6 +133,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.md,
+    // paddingTop: tabBarHeight + Spacing.md,
     paddingBottom: Spacing.tabBar,
   },
   title: {
@@ -142,9 +154,9 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
   },
   cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: Spacing.md,
   },
   titleContainer: {
@@ -160,7 +172,7 @@ const styles = StyleSheet.create({
   cardCategory: {
     fontSize: Typography.sizes.sm,
     color: Colors.textSecondary,
-    textTransform: "capitalize",
+    textTransform: 'capitalize',
   },
   trendBadge: {
     paddingHorizontal: Spacing.sm,
@@ -172,7 +184,7 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.semibold,
   },
   statsRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: Spacing.lg,
     marginBottom: Spacing.md,
   },
@@ -196,11 +208,11 @@ const styles = StyleSheet.create({
     height: 8,
     backgroundColor: Colors.slate[200],
     borderRadius: 4,
-    overflow: "hidden",
+    overflow: 'hidden',
     marginBottom: Spacing.xs,
   },
   progressFill: {
-    height: "100%",
+    height: '100%',
     backgroundColor: Colors.accent,
     borderRadius: 4,
   },
@@ -219,8 +231,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xs,
   },
   regionsList: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: Spacing.xs,
   },
   regionTag: {

@@ -13,64 +13,76 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors, Spacing, Typography } from '../../theme';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
+import { Dropdown } from '../../components/Dropdown';
 import { useAuthStore } from '../../store/authStore';
 import { authApi } from '../../api/auth';
 import { storage } from '../../utils/storage';
 import { useMutation } from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
-import { loginSchema } from './validation';
+import { registerSchema } from './validation';
 
 import type { RootStackParamList } from '../../navigation/types';
 
-export type LoginScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
+type RegisterScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Register'>;
 };
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
-  const [username, setUsername] = useState('');
+const ROLE_OPTIONS = [
+  { label: 'User', value: 'user' },
+  { label: 'Admin', value: 'admin' },
+];
+
+export const RegisterScreen: React.FC<RegisterScreenProps> = ({
+  navigation,
+}) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState('user');
   const [errors, setErrors] = useState<{
-    username?: string;
+    name?: string;
+    email?: string;
     password?: string;
+    role?: string;
   }>({});
   const [globalError, setGlobalError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
   const setUser = useAuthStore(state => state.setUser);
 
-  const loginMutation = useMutation({
-    mutationFn: authApi.login,
+  const registerMutation = useMutation({
+    mutationFn: authApi.register,
     onSuccess: async data => {
       await storage.setToken(data.token);
       setUser(data.user);
       Toast.show({
         type: 'success',
-        text1: 'Login Successful',
-        text2: 'Welcome back!',
+        text1: 'Registration Successful',
+        text2: 'Welcome to the app!',
       });
-      // AppNavigator will automatically route to MainTabs since isAuthenticated is true
     },
     onError: (err: any) => {
-      setGlobalError(
-        err.response?.data?.message || 'Invalid username or password',
-      );
+      setGlobalError(err.response?.data?.message || 'Failed to register');
     },
   });
 
-  const handleLogin = async () => {
-    const result = loginSchema.safeParse({ username, password });
+  const handleRegister = () => {
+    const result = registerSchema.safeParse({ name, email, password, role });
 
     if (!result.success) {
       const fieldErrors = result.error.formErrors.fieldErrors;
       setErrors({
-        username: fieldErrors.username?.[0],
+        name: fieldErrors.name?.[0],
+        email: fieldErrors.email?.[0],
         password: fieldErrors.password?.[0],
+        role: fieldErrors.role?.[0],
       });
       return;
     }
 
     setErrors({});
     setGlobalError('');
-    loginMutation.mutate({ email: username, password });
+    registerMutation.mutate({ name, email, password, role });
   };
 
   return (
@@ -89,10 +101,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             <View style={styles.logoContainer}>
               <Text style={styles.logoText}>MP</Text>
             </View>
-            <Text style={styles.title}>Citizen Dashboard</Text>
-            <Text style={styles.subtitle}>
-              Sign in to access development intelligence
-            </Text>
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Join the Citizen Dashboard</Text>
           </View>
 
           <View style={styles.form}>
@@ -101,16 +111,30 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             ) : null}
 
             <Input
-              label="Username"
-              placeholder="Enter username"
-              value={username}
+              label="Name"
+              placeholder="Enter your name"
+              value={name}
               onChangeText={(val) => {
-                setUsername(val);
-                if (errors.username) setErrors(prev => ({ ...prev, username: undefined }));
+                setName(val);
+                if (errors.name) setErrors(prev => ({ ...prev, name: undefined }));
+              }}
+              error={errors.name}
+            />
+
+            <View style={{ marginBottom: Spacing.md }} />
+
+            <Input
+              label="Email"
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={(val) => {
+                setEmail(val);
+                if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
               }}
               autoCapitalize="none"
               autoCorrect={false}
-              error={errors.username}
+              keyboardType="email-address"
+              error={errors.email}
             />
 
             <View style={{ marginBottom: Spacing.md }} />
@@ -133,29 +157,36 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               onRightIconPress={() => setShowPassword(!showPassword)}
             />
 
+            <View style={{marginTop: 20}}>
+              <Dropdown
+                label="Select Role"
+                data={ROLE_OPTIONS}
+                value={role}
+                onChange={item => {
+                  setRole(item.value);
+                  if (errors.role) setErrors(prev => ({ ...prev, role: undefined }));
+                }}
+                error={errors.role}
+              />
+            </View>
             <Button
-              title="Sign In"
-              onPress={handleLogin}
-              loading={loginMutation.isPending}
-              disabled={loginMutation.isPending}
+              title="Register"
+              onPress={handleRegister}
+              loading={registerMutation.isPending}
+              disabled={registerMutation.isPending}
               size="lg"
-              style={styles.loginButton}
+              style={styles.registerButton}
             />
 
             <View style={styles.switchTextContainer}>
               <Text
                 style={styles.switchText}
-                onPress={() => navigation.navigate('Register')}
+                onPress={() => navigation.goBack()}
               >
-                Don't have an account?{' '}
-                <Text style={styles.switchTextHighlight}>Register</Text>
+                Already have an account?{' '}
+                <Text style={styles.switchTextHighlight}>Login</Text>
               </Text>
             </View>
-
-            {/* <View style={styles.demoContainer}>
-              <Text style={styles.demoText}>Demo credentials:</Text>
-              <Text style={styles.demoCredentials}>admin / admin123</Text>
-            </View> */}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -178,7 +209,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: Spacing.xxl,
+    marginBottom: Spacing.xl,
   },
   logoContainer: {
     width: 80,
@@ -214,22 +245,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
     textAlign: 'center',
   },
-  loginButton: {
+  registerButton: {
     marginTop: Spacing.md,
-  },
-  demoContainer: {
-    marginTop: Spacing.xl,
-    alignItems: 'center',
-  },
-  demoText: {
-    fontSize: Typography.sizes.sm,
-    color: Colors.slate[400],
-    marginBottom: Spacing.xs,
-  },
-  demoCredentials: {
-    fontSize: Typography.sizes.md,
-    color: Colors.slate[300],
-    fontWeight: Typography.weights.medium,
   },
   eyeIcon: {
     fontSize: 20,
