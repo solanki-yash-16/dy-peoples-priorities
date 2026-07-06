@@ -11,7 +11,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: `https://dy-peoples-priorities.onrender.com:${env.PORT}`,
+        url: `https://dy-peoples-priorities.onrender.com`,
         description: "Development Server",
       },
     ],
