@@ -33,14 +33,42 @@ type TopTabBarProps = {
   navigation: BottomTabNavigationProp<MainTabParamList>;
 };
 
+import { Dimensions } from 'react-native';
+
+import { useRoute, useFocusEffect } from '@react-navigation/native';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 export const TopTabBar: React.FC<TopTabBarProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const state = navigation.getState();
-  const currentTab = state.routeNames[state.index ?? 0] as Route;
+  const route = useRoute();
+  const currentTab = route.name as Route;
+  const scrollRef = React.useRef<ScrollView>(null);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const tabIndex = (Object.keys(labels) as Route[]).indexOf(currentTab);
+      if (tabIndex !== -1) {
+        // tab width is 72, columnGap is 8 (Spacing.xs) -> ~80px per tab
+        const tabWidth = 80;
+        const xOffset = tabIndex * tabWidth - (SCREEN_WIDTH / 2) + (tabWidth / 2);
+        
+        // setTimeout ensures ScrollView layout is ready on initial mount
+        // and also safely executes scroll when switching back to already-mounted screens
+        setTimeout(() => {
+          scrollRef.current?.scrollTo({
+            x: Math.max(0, xOffset),
+            animated: true,
+          });
+        }, 50);
+      }
+    }, [currentTab])
+  );
 
   return (
     <View style={[styles.container, { paddingLeft: insets.left, paddingRight: insets.right }]}>
       <ScrollView
+        ref={scrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}

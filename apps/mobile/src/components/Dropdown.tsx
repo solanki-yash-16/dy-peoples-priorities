@@ -14,6 +14,7 @@ interface DropdownProps {
   onChange: (item: DropdownItem) => void;
   placeholder?: string;
   error?: string;
+  selectedTextColor?: string;
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
@@ -23,6 +24,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   onChange,
   placeholder = 'Select an option',
   error,
+  selectedTextColor,
 }) => {
   const [visible, setVisible] = useState(false);
 
@@ -40,7 +42,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
         onPress={() => setVisible(true)}
         activeOpacity={0.7}
       >
-        <Text style={selectedItem ? styles.selectedText : styles.placeholder}>
+        <Text style={[
+          selectedItem ? styles.selectedText : styles.placeholder,
+          selectedItem && selectedTextColor ? { color: selectedTextColor } : null
+        ]}>
           {selectedItem ? selectedItem.label : placeholder}
         </Text>
         <Text style={styles.icon}>▼</Text>
@@ -95,14 +100,15 @@ const styles = StyleSheet.create({
   label: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
-    color: Colors.slate[300],
+    color: Colors.slate[900],
+    // backgroundColor: Colors.slate[700],
     marginBottom: Spacing.xs,
   },
   dropdown: {
     height: 48,
-    backgroundColor: Colors.slate[800],
+    // backgroundColor: Colors.slate[800],
     borderWidth: 1,
-    borderColor: Colors.slate[700],
+    borderColor: Colors.slate[200],
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing.md,
     flexDirection: 'row',
@@ -148,7 +154,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.semibold,
-    color: Colors.slate[300],
+    color: Colors.slate[500],
     padding: Spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: Colors.slate[700],

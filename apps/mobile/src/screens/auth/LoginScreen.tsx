@@ -96,32 +96,28 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           </View>
 
           <View style={styles.form}>
-            {globalError ? (
-              <Text style={styles.errorText}>{globalError}</Text>
-            ) : null}
-
             <Input
               label="Username"
               placeholder="Enter username"
               value={username}
-              onChangeText={(val) => {
+              onChangeText={val => {
                 setUsername(val);
-                if (errors.username) setErrors(prev => ({ ...prev, username: undefined }));
+                if (errors.username)
+                  setErrors(prev => ({ ...prev, username: undefined }));
               }}
               autoCapitalize="none"
               autoCorrect={false}
               error={errors.username}
             />
 
-            <View style={{ marginBottom: Spacing.md }} />
-
             <Input
               label="Password"
               placeholder="Enter password"
               value={password}
-              onChangeText={(val) => {
+              onChangeText={val => {
                 setPassword(val);
-                if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
+                if (errors.password)
+                  setErrors(prev => ({ ...prev, password: undefined }));
               }}
               secureTextEntry={!showPassword}
               autoCapitalize="none"
@@ -132,6 +128,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               }
               onRightIconPress={() => setShowPassword(!showPassword)}
             />
+
+            <View style={{ marginTop: Spacing.md }} />
+            {globalError ? (
+              <Text style={styles.errorText}>{globalError}</Text>
+            ) : null}
 
             <Button
               title="Sign In"
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: Spacing.xxl,
+    marginBottom: Spacing.sm,
   },
   logoContainer: {
     width: 80,
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   switchText: {
-    fontSize: Typography.sizes.md,
+    fontSize: Typography.sizes.sm,
     color: Colors.slate[400],
   },
   switchTextHighlight: {

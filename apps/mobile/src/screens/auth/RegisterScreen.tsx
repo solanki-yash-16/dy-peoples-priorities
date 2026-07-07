@@ -106,17 +106,14 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
           </View>
 
           <View style={styles.form}>
-            {globalError ? (
-              <Text style={styles.errorText}>{globalError}</Text>
-            ) : null}
-
             <Input
               label="Name"
               placeholder="Enter your name"
               value={name}
-              onChangeText={(val) => {
+              onChangeText={val => {
                 setName(val);
-                if (errors.name) setErrors(prev => ({ ...prev, name: undefined }));
+                if (errors.name)
+                  setErrors(prev => ({ ...prev, name: undefined }));
               }}
               error={errors.name}
             />
@@ -127,9 +124,10 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
               label="Email"
               placeholder="Enter your email"
               value={email}
-              onChangeText={(val) => {
+              onChangeText={val => {
                 setEmail(val);
-                if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
+                if (errors.email)
+                  setErrors(prev => ({ ...prev, email: undefined }));
               }}
               autoCapitalize="none"
               autoCorrect={false}
@@ -143,9 +141,10 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
               label="Password"
               placeholder="Enter password"
               value={password}
-              onChangeText={(val) => {
+              onChangeText={val => {
                 setPassword(val);
-                if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
+                if (errors.password)
+                  setErrors(prev => ({ ...prev, password: undefined }));
               }}
               secureTextEntry={!showPassword}
               autoCapitalize="none"
@@ -157,18 +156,24 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
               onRightIconPress={() => setShowPassword(!showPassword)}
             />
 
-            <View style={{marginTop: 20}}>
+            <View style={{ marginTop: 20 }}>
               <Dropdown
                 label="Select Role"
                 data={ROLE_OPTIONS}
                 value={role}
                 onChange={item => {
                   setRole(item.value);
-                  if (errors.role) setErrors(prev => ({ ...prev, role: undefined }));
+                  if (errors.role)
+                    setErrors(prev => ({ ...prev, role: undefined }));
                 }}
                 error={errors.role}
               />
             </View>
+
+            {globalError ? (
+              <Text style={styles.errorText}>{globalError}</Text>
+            ) : null}
+
             <Button
               title="Register"
               onPress={handleRegister}
@@ -209,7 +214,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.sm,
   },
   logoContainer: {
     width: 80,
@@ -256,7 +261,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   switchText: {
-    fontSize: Typography.sizes.md,
+    fontSize: Typography.sizes.sm,
     color: Colors.slate[400],
   },
   switchTextHighlight: {

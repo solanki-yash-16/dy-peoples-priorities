@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   statValue: {
-    fontSize: Typography.sizes.xxl,
+    fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
     color: Colors.text,
   },
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: Spacing.md,
+    padding: Spacing.sm,
   },
   menuItemLeft: {
     flexDirection: 'row',
