@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
 import { Card } from '../../components/Card';
+import { TopTabBar } from '../../navigation/CustomTabBar';
 import { mockRankings, categoryColors } from '../../utils/mockData';
 
 interface RankingsScreenProps {
@@ -21,6 +22,7 @@ export const RankingsScreen: React.FC<RankingsScreenProps> = ({ navigation }) =>
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <TopTabBar navigation={navigation} />
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
@@ -208,16 +210,17 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.md,
+    // paddingTop: tabBarHeight + Spacing.md,
     paddingBottom: Spacing.tabBar,
   },
   title: {
-    fontSize: Typography.sizes.xxl,
+    fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
     color: Colors.text,
     marginBottom: Spacing.xs,
   },
   subtitle: {
-    fontSize: Typography.sizes.md,
+    fontSize: Typography.sizes.sm,
     color: Colors.textSecondary,
     marginBottom: Spacing.md,
   },
@@ -244,7 +247,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   card: {
-    padding: Spacing.md,
+    // padding: Spacing.md,
   },
   rankContainer: {
     flexDirection: 'row',

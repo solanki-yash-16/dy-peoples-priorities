@@ -42,8 +42,8 @@ export const Button: React.FC<ButtonProps> = ({
 
     const sizeStyles: Record<string, ViewStyle> = {
       sm: { paddingVertical: Spacing.sm, paddingHorizontal: Spacing.md },
-      md: { paddingVertical: Spacing.md, paddingHorizontal: Spacing.lg },
-      lg: { paddingVertical: Spacing.lg, paddingHorizontal: Spacing.xl },
+      md: { paddingVertical: Spacing.sm, paddingHorizontal: Spacing.sm },
+      lg: { paddingVertical: Spacing.md, paddingHorizontal: Spacing.xl },
     };
 
     const variantStyles: Record<string, ViewStyle> = {

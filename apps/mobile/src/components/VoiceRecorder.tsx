@@ -4,7 +4,7 @@ import { Colors, Spacing, BorderRadius, Typography } from "../theme";
 import { useVoiceRecorder } from "../hooks/useVoiceRecorder";
 
 interface VoiceRecorderProps {
-  onTranscriptionComplete: (text: string) => void;
+  onTranscriptionComplete: (text: string, audioUri: string | null) => void;
   onCancel: () => void;
 }
 
@@ -38,9 +38,9 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   }, [isRecording, scaleAnim]);
 
   const handleStop = async () => {
-    const text = await stopRecording();
-    if (text) {
-      onTranscriptionComplete(text);
+    const { transcription: text, uri } = await stopRecording();
+    if (text || uri) {
+      onTranscriptionComplete(text, uri);
     }
   };
 

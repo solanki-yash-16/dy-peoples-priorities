@@ -14,7 +14,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({
   onCancel,
   existingPhoto,
 }) => {
-  const { capturedPhoto, isCapturing, capturePhoto, retakePhoto } = useCamera();
+  const { capturedPhoto, isCapturing, capturePhoto, retakePhoto, pickImage } = useCamera();
   const [flashOn, setFlashOn] = useState(false);
 
   const handleCapture = async () => {
@@ -79,9 +79,12 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({
           <View style={styles.captureControls}>
             <TouchableOpacity
               style={styles.galleryButton}
-              onPress={() =>
-                Alert.alert("Gallery", "Gallery picker would open here")
-              }
+              onPress={async () => {
+                const photo = await pickImage();
+                if (photo) {
+                  onPhotoCaptured(photo);
+                }
+              }}
               activeOpacity={0.8}
             >
               <Text style={styles.galleryText}>🖼️</Text>
@@ -177,10 +180,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   controls: {
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
     paddingVertical: Spacing.lg,
     paddingHorizontal: Spacing.xl,
     paddingBottom: Spacing.xxl,
+        backgroundColor: Colors.slate[900],
+
   },
   captureControls: {
     flexDirection: "row",

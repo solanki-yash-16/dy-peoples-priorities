@@ -30,7 +30,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm min-w-0">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200">
+          <div className="px-4 sm:px-6 py- sm:py-4 border-b border-slate-200">
             <h3 className="font-semibold text-slate-900 text-sm sm:text-base">Top Priority Projects</h3>
           </div>
           <div className="divide-y divide-slate-100">

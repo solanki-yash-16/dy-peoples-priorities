@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { Alert, Platform, PermissionsAndroid } from "react-native";
+import { Alert, PermissionsAndroid, Platform } from "react-native";
+import { launchCamera, launchImageLibrary, Asset } from "react-native-image-picker";
 
 export interface CameraState {
   capturedPhoto: string | null;
@@ -14,58 +15,129 @@ export const useCamera = () => {
     error: null,
   });
 
-  const capturePhoto = useCallback(async (): Promise<string | null> => {
-    try {
-      if (Platform.OS === "android") {
-        const hasPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.CAMERA
-        );
-        if (!hasPermission) {
-          const status = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.CAMERA,
-            {
-              title: "Camera Permission",
-              message: "This app needs camera permission to capture photos.",
-              buttonNeutral: "Ask Me Later",
-              buttonNegative: "Cancel",
-              buttonPositive: "OK",
-            }
-          );
-          if (status !== PermissionsAndroid.RESULTS.GRANTED) {
-            Alert.alert("Permission Denied", "Camera permission is required to capture photos.");
-            return null;
+  const requestCameraPermission = async (): Promise<boolean> => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: "Camera Permission",
+            message: "App needs camera permission to capture photos.",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK"
           }
-        }
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        console.warn(err);
+        return false;
       }
-      setState((prev) => ({ ...prev, isCapturing: true, error: null }));
+    }
+    return true; // iOS handles via Info.plist
+  };
 
-      await new Promise<void>((resolve) => setTimeout(() => resolve(), 1000));
+  const capturePhoto = useCallback(async (): Promise<string | null> => {
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) {
+      Alert.alert(
+        "Permission Denied",
+        "Camera permission is required to capture photos."
+      );
+      return null;
+    }
 
-      const mockPhotos = [
-        "https://images.unsplash.com/photo-1504982200934-3ad037449f9a?w=800",
-        "https://images.unsplash.com/photo-1517242810446-cc1b8b530303?w=800",
-        "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800",
-        "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800",
-      ];
+    setState((prev) => ({ ...prev, isCapturing: true, error: null }));
 
-      const capturedPhoto = mockPhotos[Math.floor(Math.random() * mockPhotos.length)];
-
-      setState((prev) => ({
-        ...prev,
-        isCapturing: false,
-        capturedPhoto,
-        error: null,
-      }));
-
-      return capturedPhoto;
+    try {
+      return new Promise((resolve) => {
+        launchCamera(
+          {
+            mediaType: 'photo',
+            quality: 0.8,
+            saveToPhotos: false,
+          },
+          (response) => {
+            if (response.didCancel) {
+              setState((prev) => ({ ...prev, isCapturing: false }));
+              resolve(null);
+            } else if (response.errorCode) {
+              setState((prev) => ({
+                ...prev,
+                isCapturing: false,
+                error: response.errorMessage || "Camera error",
+              }));
+              resolve(null);
+            } else if (response.assets && response.assets.length > 0) {
+              const photoUri = response.assets[0].uri || null;
+              setState((prev) => ({
+                ...prev,
+                isCapturing: false,
+                capturedPhoto: photoUri,
+                error: null,
+              }));
+              resolve(photoUri);
+            } else {
+              setState((prev) => ({ ...prev, isCapturing: false }));
+              resolve(null);
+            }
+          }
+        );
+      });
     } catch {
       setState((prev) => ({
         ...prev,
         isCapturing: false,
-        capturedPhoto: null,
-        error: "Failed to capture photo. Please try again.",
+        error: "Failed to capture photo.",
       }));
-      Alert.alert("Camera Error", "Failed to capture photo. Please try again.");
+      return null;
+    }
+  }, []);
+
+  const pickImage = useCallback(async (): Promise<string | null> => {
+    setState((prev) => ({ ...prev, isCapturing: true, error: null }));
+
+    try {
+      return new Promise((resolve) => {
+        launchImageLibrary(
+          {
+            mediaType: 'photo',
+            quality: 0.8,
+            selectionLimit: 1,
+          },
+          (response) => {
+            if (response.didCancel) {
+              setState((prev) => ({ ...prev, isCapturing: false }));
+              resolve(null);
+            } else if (response.errorCode) {
+              setState((prev) => ({
+                ...prev,
+                isCapturing: false,
+                error: response.errorMessage || "Gallery error",
+              }));
+              resolve(null);
+            } else if (response.assets && response.assets.length > 0) {
+              const photoUri = response.assets[0].uri || null;
+              setState((prev) => ({
+                ...prev,
+                isCapturing: false,
+                capturedPhoto: photoUri,
+                error: null,
+              }));
+              resolve(photoUri);
+            } else {
+              setState((prev) => ({ ...prev, isCapturing: false }));
+              resolve(null);
+            }
+          }
+        );
+      });
+    } catch {
+      setState((prev) => ({
+        ...prev,
+        isCapturing: false,
+        error: "Failed to pick photo.",
+      }));
       return null;
     }
   }, []);
@@ -89,6 +161,7 @@ export const useCamera = () => {
   return {
     ...state,
     capturePhoto,
+    pickImage,
     retakePhoto,
     clearPhoto,
   };
