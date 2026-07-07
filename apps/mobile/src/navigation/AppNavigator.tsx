@@ -78,7 +78,7 @@ export const AppNavigator = () => {
       }
     };
     initAuth();
-  }, []);
+  }, [setInitializing, setUser]);
 
   if (isInitializing) {
     return (
