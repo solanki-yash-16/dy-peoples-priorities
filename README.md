@@ -78,9 +78,11 @@ cd dy-peoples-priorities
 pnpm install
 ```
 
-### 3. Environment Variables
-You need to set up the environment variables for the backend. Create a `.env` file inside `apps/backend/`:
+### 3. Environment Configuration
+You need to configure the environment for the backend, dashboard, and mobile app.
 
+**Backend (`apps/backend/.env`)**
+Create a `.env` file in the `apps/backend/` directory:
 ```env
 PORT=5000
 NODE_ENV=development
@@ -91,6 +93,19 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_app_password
+```
+
+**Admin Dashboard (`apps/next-app/.env`)**
+Create a `.env` file in the `apps/next-app/` directory pointing to your backend:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+```
+
+**Citizen Mobile App (`apps/mobile/src/api/axios.ts`)**
+The mobile app currently configures its API URL directly in the Axios client. To point the mobile app to your local backend, update line 5 in `apps/mobile/src/api/axios.ts`:
+```typescript
+  // Replace with your computer's local network IP address (e.g., 192.168.x.x)
+  baseURL: 'http://<YOUR_LOCAL_IP>:5000/api/v1', 
 ```
 
 ### 4. Start the Engines!
