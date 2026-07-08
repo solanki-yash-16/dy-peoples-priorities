@@ -22,11 +22,11 @@ export const SubmissionsScreen: React.FC<SubmissionsScreenProps> = ({ navigation
   const [appliedFilters, setAppliedFilters] = useState({ district: "", status: "", sort: "-createdAt" });
 
   const handleApply = (overrides?: { district?: string; status?: string; sort?: string }) => {
-    setAppliedFilters(prev => ({
+    setAppliedFilters({
       district: overrides?.district !== undefined ? overrides.district : district,
       status: overrides?.status !== undefined ? overrides.status : status,
       sort: overrides?.sort !== undefined ? overrides.sort : sort,
-    }));
+    });
   };
 
   const {

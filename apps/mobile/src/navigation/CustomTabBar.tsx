@@ -74,16 +74,16 @@ export const TopTabBar: React.FC<TopTabBarProps> = ({ navigation }) => {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {(Object.keys(labels) as Route[]).map((route) => {
-          const isFocused = currentTab === route;
+        {(Object.keys(labels) as Route[]).map((routeName) => {
+          const isFocused = currentTab === routeName;
 
           const onPress = () => {
-            navigation.navigate(route);
+            navigation.navigate(routeName);
           };
 
           return (
             <TouchableOpacity
-              key={route}
+              key={routeName}
               activeOpacity={0.7}
               onPress={onPress}
               style={styles.tab}
@@ -95,7 +95,7 @@ export const TopTabBar: React.FC<TopTabBarProps> = ({ navigation }) => {
                 ]}
                 numberOfLines={1}
               >
-                {icons[route]}
+                {icons[routeName]}
               </Text>
               <Text
                 style={[
@@ -104,7 +104,7 @@ export const TopTabBar: React.FC<TopTabBarProps> = ({ navigation }) => {
                 ]}
                 numberOfLines={1}
               >
-                {labels[route]}
+                {labels[routeName]}
               </Text>
               {isFocused ? <View style={styles.indicator} /> : null}
             </TouchableOpacity>

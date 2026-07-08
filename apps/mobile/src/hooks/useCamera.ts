@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { Alert, PermissionsAndroid, Platform } from "react-native";
-import { launchCamera, launchImageLibrary, Asset } from "react-native-image-picker";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 
 export interface CameraState {
   capturedPhoto: string | null;

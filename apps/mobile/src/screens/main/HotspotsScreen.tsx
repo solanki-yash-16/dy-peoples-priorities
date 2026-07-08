@@ -5,6 +5,9 @@ import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
 import { Card } from '../../components/Card';
 import { TopTabBar } from '../../navigation/CustomTabBar';
 import { mockHotspots } from '../../utils/mockData';
+import { useQuery } from '@tanstack/react-query';
+import { complaintApi } from '../../api/complaint';
+import WebView from 'react-native-webview';
 
 interface HotspotsScreenProps {
   navigation: any;
@@ -25,6 +28,11 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({
     return 'Moderate';
   };
 
+  const { data: heatmapData, isLoading: isLoadingHeatmap } = useQuery({
+    queryKey: ['heatmap'],
+    queryFn: () => complaintApi.getHeatmap(),
+  });
+
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -33,6 +41,50 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({
     });
     return unsubscribe;
   }, [navigation]);
+
+  const generateLeafletHtml = () => {
+    const points = heatmapData?.data || [];
+    const centerLat = points[0]?.lat || 28.6139;
+    const centerLng = points[0]?.lng || 77.209;
+
+    const markersCode = points
+      .map(
+        (p: any) =>
+          `L.marker([${p.lat}, ${p.lng}], {icon: redIcon}).addTo(map);`
+      )
+      .join('\\n');
+
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <style>
+          body { padding: 0; margin: 0; }
+          html, body, #map { height: 100%; width: 100%; }
+        </style>
+      </head>
+      <body>
+        <div id="map"></div>
+        <script>
+          var map = L.map('map', { zoomControl: false }).setView([${centerLat}, ${centerLng}], 10);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OSM'
+          }).addTo(map);
+          var redIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+          });
+          ${markersCode}
+        </script>
+      </body>
+      </html>
+    `;
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -47,12 +99,17 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({
           Geographic concentration of citizen demand
         </Text>
 
-        <View style={styles.mapPlaceholder}>
-          <Text style={styles.mapIcon}>🗺️</Text>
-          <Text style={styles.mapText}>Interactive Map</Text>
-          <Text style={styles.mapSubtext}>
-            Integrate Mapbox or Google Maps for visualization
-          </Text>
+        <View style={styles.mapContainer}>
+          {isLoadingHeatmap ? (
+            <Text style={styles.mapText}>Loading Map...</Text>
+          ) : (
+            <WebView
+              originWhitelist={['*']}
+              source={{ html: generateLeafletHtml() }}
+              style={{ width: '100%', height: '100%' }}
+              scrollEnabled={false}
+            />
+          )}
         </View>
 
         <View style={styles.list}>
@@ -159,10 +216,11 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginBottom: Spacing.lg,
   },
-  mapPlaceholder: {
-    height: 200,
+  mapContainer: {
+    height: 250,
     backgroundColor: Colors.slate[100],
     borderRadius: BorderRadius.lg,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: Spacing.lg,
