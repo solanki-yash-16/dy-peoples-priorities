@@ -8,9 +8,9 @@ import * as z from 'zod';
 import { motion } from 'framer-motion';
 import { Command, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/providers/auth-provider';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@repo/ui';
+import { Input } from '@repo/ui';
+import { Label } from '@repo/ui';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -62,7 +62,7 @@ export default function RegisterPage() {
     >
       <div className="flex flex-col space-y-3 text-center lg:text-left">
         <div className="flex justify-center lg:hidden mb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg">
             <Command className="h-6 w-6" />
           </div>
         </div>

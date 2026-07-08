@@ -7,13 +7,13 @@ import { motion } from "framer-motion"
 import { Loader2, CheckCircle2 } from "lucide-react"
 
 import { Button } from "@repo/ui"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select } from "@/components/ui/select"
+import { Textarea } from '@repo/ui';
+import { Label } from '@repo/ui';
+import { Select } from '@repo/ui';
 import { VoiceRecorder } from "@/components/ui/voice-recorder"
 import { ImageUploader } from "@/components/ui/image-uploader"
 import { LocationPicker, type LocationData } from "@/components/ui/LocationPicker"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@repo/ui';
 import { createComplaintSchema, type CreateComplaintDTO } from "@/lib/schemas/complaint.schema"
 
 export function ComplaintForm() {

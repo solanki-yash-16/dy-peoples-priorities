@@ -33,12 +33,12 @@ export function Navbar() {
               Search
             </label>
             <Search
-              className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-muted-foreground pl-3"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
               aria-hidden="true"
             />
             <input
               id="search-field"
-              className="block h-10 w-full rounded-md border border-input bg-transparent py-2 pl-10 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              className="block h-10 w-full rounded-md border border-input bg-transparent py-2 pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
               placeholder="Search..."
               type="search"
               name="search"
