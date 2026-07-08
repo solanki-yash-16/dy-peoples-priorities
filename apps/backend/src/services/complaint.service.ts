@@ -45,7 +45,7 @@ export class ComplaintService {
     }
 
     // Build sort object from string like "-createdAt,priority"
-    const sortParams: Record<string, number> = {};
+    const sortParams: Record<string, 1 | -1> = {};
     sortStr.split(',').forEach((field) => {
       if (field.startsWith('-')) {
         sortParams[field.substring(1)] = -1;
@@ -67,6 +67,14 @@ export class ComplaintService {
       updatePayload.aiAnalysis = aiAnalysis;
     }
     return await this.repository.updateById(id, updatePayload);
+  }
+
+  async updateComplaint(id: string, update: Record<string, unknown>) {
+    return await this.repository.updateById(id, update);
+  }
+
+  async deleteComplaint(id: string) {
+    return await this.repository.deleteById(id);
   }
 
   async getStats() {
