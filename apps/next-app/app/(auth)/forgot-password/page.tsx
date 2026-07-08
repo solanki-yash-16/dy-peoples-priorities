@@ -7,9 +7,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion } from 'framer-motion';
 import { Command, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@repo/ui';
+import { Input } from '@repo/ui';
+import { Label } from '@repo/ui';
 import { authService } from '@/services/auth.service';
 
 const forgotPasswordSchema = z.object({
@@ -83,7 +83,7 @@ export default function ForgotPasswordPage() {
     >
       <div className="flex flex-col space-y-3 text-center lg:text-left">
         <div className="flex justify-center lg:hidden mb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg">
             <Command className="h-6 w-6" />
           </div>
         </div>

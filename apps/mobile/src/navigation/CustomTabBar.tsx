@@ -52,7 +52,7 @@ export const TopTabBar: React.FC<TopTabBarProps> = ({ navigation }) => {
         // tab width is 72, columnGap is 8 (Spacing.xs) -> ~80px per tab
         const tabWidth = 80;
         const xOffset = tabIndex * tabWidth - (SCREEN_WIDTH / 2) + (tabWidth / 2);
-        
+
         // setTimeout ensures ScrollView layout is ready on initial mount
         // and also safely executes scroll when switching back to already-mounted screens
         setTimeout(() => {

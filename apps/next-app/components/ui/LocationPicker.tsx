@@ -5,8 +5,8 @@ import { useLoadScript, GoogleMap, Marker } from "@react-google-maps/api"
 import { MapPin, Loader2, Navigation } from "lucide-react"
 
 import { Button } from "@repo/ui"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Input } from '@repo/ui';
+import { Label } from '@repo/ui';
 import { cn } from "@/lib/utils"
 
 const LIBRARIES: ("places" | "geometry" | "drawing" | "visualization")[] = ["places"]
