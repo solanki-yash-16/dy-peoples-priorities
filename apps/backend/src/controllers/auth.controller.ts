@@ -232,7 +232,7 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response, n
     });
 
     res.status(200).json({ success: true, data: "Email sent" });
-  } catch (_error) {
+  } catch {
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 

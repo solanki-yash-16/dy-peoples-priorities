@@ -142,6 +142,14 @@ This allows asynchronous background workers (e.g., Python/FastAPI running LLMs) 
 
 ---
 
+## 🔄 Recent Updates
+
+- **Data Schema Sync:** Synchronized frontend `Complaint` interfaces to accurately map properties (category, summary/title, urgency) from the backend's `aiAnalysis` engine.
+- **Dashboard Enhancements:** Updated the Admin Dashboard's complaints table and live feed to dynamically display real-time AI-generated summaries and analytics.
+- **Code Quality:** Enforced strict TypeScript configurations and resolved all ESLint warnings/errors across the entire monorepo (`backend`, `next-app`, `mobile`, `web`, `ui`) for a highly maintainable, warning-free codebase.
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions during and after the hackathon!

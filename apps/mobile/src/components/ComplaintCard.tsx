@@ -49,8 +49,8 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
     console.error(e)
   }
 
-  const getStatusColor = (status: string = '') => {
-    switch (status.toLowerCase()) {
+  const getStatusColor = (s: string = '') => {
+    switch (s.toLowerCase()) {
       case 'approve':
       case 'approved':
         return Colors.success;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Colors, Spacing, BorderRadius, Typography } from "../theme";
 import { useCamera } from "../hooks/useCamera";
 
