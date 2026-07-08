@@ -24,6 +24,8 @@ This platform bridges the gap between citizens and municipal authorities. It all
 - **Admin Dashboard:** A beautiful, high-performance Next.js dashboard for city officials to track, filter, and resolve issues.
 - **Data Analytics:** Heatmaps, category breakdowns, and priority charts using real-time MongoDB data.
 - **AI-Ready:** Designed with placeholders and infrastructure for AI-driven sentiment analysis, automated categorization, and urgency scoring.
+- **Robust Authentication:** Secure JWT-based auth flow including real email integration for secure password recovery.
+- **Enterprise Standards:** Built with strict TypeScript configuration and zero ESLint warnings for a highly maintainable codebase.
 
 ---
 
@@ -85,6 +87,10 @@ NODE_ENV=development
 MONGO_URI=mongodb://localhost:27017/dy-peoples-priorities
 JWT_SECRET=your_super_secret_jwt_key_here
 JWT_EXPIRES_IN=7d
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
 ```
 
 ### 4. Start the Engines!
