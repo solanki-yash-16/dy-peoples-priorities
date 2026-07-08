@@ -52,7 +52,7 @@ export const TopTabBar: React.FC<TopTabBarProps> = ({ navigation }) => {
         // tab width is 72, columnGap is 8 (Spacing.xs) -> ~80px per tab
         const tabWidth = 80;
         const xOffset = tabIndex * tabWidth - (SCREEN_WIDTH / 2) + (tabWidth / 2);
-        
+
         // setTimeout ensures ScrollView layout is ready on initial mount
         // and also safely executes scroll when switching back to already-mounted screens
         setTimeout(() => {
@@ -74,16 +74,16 @@ export const TopTabBar: React.FC<TopTabBarProps> = ({ navigation }) => {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {(Object.keys(labels) as Route[]).map((r) => {
-          const isFocused = currentTab === r;
+        {(Object.keys(labels) as Route[]).map((routeName) => {
+          const isFocused = currentTab === routeName;
 
           const onPress = () => {
-            navigation.navigate(r);
+            navigation.navigate(routeName);
           };
 
           return (
             <TouchableOpacity
-              key={r}
+              key={routeName}
               activeOpacity={0.7}
               onPress={onPress}
               style={styles.tab}
@@ -95,7 +95,7 @@ export const TopTabBar: React.FC<TopTabBarProps> = ({ navigation }) => {
                 ]}
                 numberOfLines={1}
               >
-                {icons[r]}
+                {icons[routeName]}
               </Text>
               <Text
                 style={[
@@ -104,7 +104,7 @@ export const TopTabBar: React.FC<TopTabBarProps> = ({ navigation }) => {
                 ]}
                 numberOfLines={1}
               >
-                {labels[r]}
+                {labels[routeName]}
               </Text>
               {isFocused ? <View style={styles.indicator} /> : null}
             </TouchableOpacity>
