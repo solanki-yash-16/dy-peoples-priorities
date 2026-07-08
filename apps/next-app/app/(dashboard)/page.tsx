@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui';
 import { AlertCircle, TrendingUp, CheckCircle, Activity, Sparkles, MapPin, ArrowRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useComplaintStats, useHeatmap } from '@/hooks/use-complaints';
@@ -279,14 +279,8 @@ export default function DashboardOverview() {
             </CardHeader>
             <CardContent className="p-0 flex-1 relative min-h-[400px]">
               <div className="absolute inset-0 bg-zinc-50 dark:bg-zinc-900/50 flex items-center justify-center">
-                {/* Matrix dot representation to look premium */}
-                <div className="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(#09090b_1.5px,transparent_1.5px)] [background-size:16px_16px] dark:bg-[radial-gradient(#fafafa_1.5px,transparent_1.5px)]" />
-                
-                <div className="absolute inset-0 flex items-center justify-center z-0 overflow-hidden">
-                  <div className="w-[800px] h-[800px] border border-primary/10 rounded-full absolute" />
-                  <div className="w-[600px] h-[600px] border border-primary/10 rounded-full absolute" />
-                  <div className="w-[400px] h-[400px] border border-dashed border-primary/20 rounded-full animate-[ping_8s_infinite] absolute" />
-                  <div className="w-[200px] h-[200px] border border-dashed border-primary/30 rounded-full animate-[ping_4s_infinite] absolute" />
+                <div className="absolute inset-0 bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay" />
                 </div>
 
                 {mapLoading ? (
@@ -329,17 +323,19 @@ export default function DashboardOverview() {
             <CardContent className="p-0 overflow-y-auto flex-1 custom-scrollbar">
               <div className="flex flex-col">
                 {stats.recent?.length > 0 ? (
-                  stats.recent.map((complaint, i) => (
+                  stats.recent.map((complaint, i) => {
+                    const displayTitle = complaint.aiAnalysis?.summary || complaint.description?.originalText || 'Complaint';
+                    return (
                     <div key={complaint._id} className={`group relative flex items-start gap-4 p-5 hover:bg-muted/50 transition-colors duration-200 ${i !== stats.recent.length - 1 ? 'border-b border-border/50' : ''}`}>
                       <div className="flex-shrink-0 mt-1">
                         <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold shadow-inner">
-                          {complaint.title?.charAt(0) || 'C'}
+                          {displayTitle.charAt(0)}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0 space-y-2">
                         <div className="flex items-start justify-between gap-2">
                           <p className="text-sm font-semibold text-foreground line-clamp-2 leading-tight pr-2">
-                            {complaint.title}
+                            {displayTitle}
                           </p>
                         </div>
                         <div className="flex items-center flex-wrap gap-2">
@@ -362,7 +358,7 @@ export default function DashboardOverview() {
                         </div>
                       </div>
                     </div>
-                  ))
+                  )})
                 ) : (
                   <div className="flex flex-col items-center justify-center text-muted-foreground p-12 text-center h-full">
                     <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">

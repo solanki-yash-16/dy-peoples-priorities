@@ -6,7 +6,7 @@ import { UploadCloud, X, Loader2, CheckCircle2, AlertCircle } from "lucide-react
 import { motion, AnimatePresence } from "framer-motion"
 
 import { cn } from "@/lib/utils"
-import { useFirebaseUpload } from "@/hooks/useFirebaseUpload"
+import { uploadService } from "@/services/upload.service"
 
 export interface UploadedImage {
   id: string;
@@ -21,17 +21,24 @@ interface ImageItemProps {
 }
 
 function ImageItem({ image, onRemove }: ImageItemProps) {
-  const { uploadImage, uploadState } = useFirebaseUpload()
+  const [uploadState, setUploadState] = React.useState<{status: "IDLE"|"COMPRESSING"|"UPLOADING"|"SUCCESS"|"ERROR", progress: number, error?: string}>({status: "IDLE", progress: 0})
   const [finalUrl, setFinalUrl] = React.useState<string | null>(!image.url.startsWith("blob:") ? image.url : null)
 
   React.useEffect(() => {
     // Only upload if we haven't already got a URL
     if (image.url.startsWith("blob:") && uploadState.status === "IDLE") {
-      uploadImage(image.file).then(url => {
-        setFinalUrl(url)
-      }).catch(err => {
-        console.error("Failed to upload image", err)
-      })
+      const doUpload = async () => {
+        setUploadState({status: "UPLOADING", progress: 50})
+        try {
+          const url = await uploadService.uploadImage(image.file)
+          setUploadState({status: "SUCCESS", progress: 100})
+          setFinalUrl(url)
+        } catch (err) {
+          console.error("Failed to upload image", err)
+          setUploadState({status: "ERROR", progress: 0, error: "Upload failed"})
+        }
+      }
+      void doUpload()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

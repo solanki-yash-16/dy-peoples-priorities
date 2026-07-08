@@ -3,8 +3,8 @@
 import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useComplaintDetails, useUpdateComplaintStatus } from '@/hooks/use-complaints';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@repo/ui';
+import { Button } from '@repo/ui';
 import { ChevronLeft, MapPin, User, Clock, AlertTriangle, FileText, BrainCircuit } from 'lucide-react';
 
 export default function ComplaintDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -67,12 +67,12 @@ export default function ComplaintDetailsPage({ params }: { params: Promise<{ id:
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight">{complaint.title}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{complaint.aiAnalysis?.summary || complaint.description?.originalText || 'Complaint Details'}</h1>
             <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize border ${getStatusColor(complaint.status)}`}>
               {complaint.status.replace('_', ' ')}
             </span>
             <span className="inline-flex items-center rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-xs font-medium capitalize text-slate-800">
-              {complaint.priority} Priority
+              {complaint.aiAnalysis?.urgencyScore !== undefined ? `${complaint.aiAnalysis.urgencyScore} Priority` : 'Priority Not Analyzed'}
             </span>
           </div>
           <p className="text-sm text-muted-foreground">ID: {complaint._id} • Created on {new Date(complaint.createdAt).toLocaleString()}</p>
@@ -92,7 +92,7 @@ export default function ComplaintDetailsPage({ params }: { params: Promise<{ id:
             </CardHeader>
             <CardContent>
               <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {complaint.description?.text || "No text description provided."}
+                {complaint.description?.originalText || "No text description provided."}
               </p>
             </CardContent>
           </Card>
@@ -144,12 +144,12 @@ export default function ComplaintDetailsPage({ params }: { params: Promise<{ id:
               <CardTitle className="text-lg">Attached Media</CardTitle>
             </CardHeader>
             <CardContent>
-              {complaint.description?.mediaUrls?.length > 0 ? (
+              {complaint.media && complaint.media.filter(m => m.type === 'IMAGE').length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {complaint.description.mediaUrls.map((url, i) => (
+                  {complaint.media.filter(m => m.type === 'IMAGE').map((m, i) => (
                     <div key={i} className="aspect-square bg-muted rounded-md border overflow-hidden relative group">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url} alt={`Evidence ${i+1}`} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/400?text=Image+Not+Found')} />
+                      <img src={m.url} alt={`Evidence ${i+1}`} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/400?text=Image+Not+Found')} />
                     </div>
                   ))}
                 </div>
@@ -159,10 +159,10 @@ export default function ComplaintDetailsPage({ params }: { params: Promise<{ id:
                 </div>
               )}
               
-              {complaint.description?.audioUrl && (
+              {complaint.media && complaint.media.find(m => m.type === 'VOICE') && (
                 <div className="mt-4 p-4 bg-muted/50 rounded-md border flex items-center gap-4">
                   <audio controls className="w-full h-10">
-                    <source src={complaint.description.audioUrl} type="audio/mpeg" />
+                    <source src={complaint.media.find(m => m.type === 'VOICE')?.url} type="audio/mpeg" />
                     Your browser does not support the audio element.
                   </audio>
                 </div>
@@ -185,7 +185,7 @@ export default function ComplaintDetailsPage({ params }: { params: Promise<{ id:
               <div className="space-y-4">
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Suggested Department</p>
-                  <p className="text-sm font-medium">{complaint.category || 'Municipal Corporation'}</p>
+                  <p className="text-sm font-medium">{complaint.aiAnalysis?.category || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Sentiment Score</p>
@@ -213,11 +213,11 @@ export default function ComplaintDetailsPage({ params }: { params: Promise<{ id:
             <CardContent>
               <div className="flex items-center gap-4 mb-4">
                 <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
-                  {complaint.user?.name?.charAt(0) || 'U'}
+                  {complaint.user?.name?.charAt(0) || complaint.userId?.charAt(0) || 'U'}
                 </div>
                 <div>
-                  <p className="text-sm font-medium">{complaint.user?.name || 'Anonymous Citizen'}</p>
-                  <p className="text-xs text-muted-foreground">ID: {complaint.user?._id}</p>
+                  <p className="text-sm font-medium">{complaint.user?.name || complaint.userId || 'Anonymous Citizen'}</p>
+                  <p className="text-xs text-muted-foreground">ID: {complaint.user?._id || complaint.userId}</p>
                 </div>
               </div>
             </CardContent>

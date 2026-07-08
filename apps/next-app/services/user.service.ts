@@ -10,12 +10,13 @@ export const userService = {
     });
     
     const response = await apiClient.get(`/v1/users?${params.toString()}`);
-    const data = response.data.data || response.data;
+    // Support either response.data.users, response.data.data or raw array
+    const responseData = response.data.users || response.data.data || response.data;
     
     return {
       success: true,
-      data: Array.isArray(data) ? data : [],
-      total: response.data.total || data.length || 0,
+      data: Array.isArray(responseData) ? responseData : [],
+      total: response.data.total || response.data.pagination?.total || (Array.isArray(responseData) ? responseData.length : 0),
     };
   },
 

@@ -114,7 +114,7 @@ export const useVoiceRecorder = () => {
     try {
       await audioRecorderPlayer.stopRecorder();
       audioRecorderPlayer.removeRecordBackListener();
-    } catch (err) {
+    } catch {
       // Ignore errors on cancel
     }
     setState((prev) => ({
