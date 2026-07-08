@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
+import { asyncHandler, createError } from '../middleware/errorHandler.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -56,14 +57,14 @@ const upload = multer({ storage });
  *       200:
  *         description: Image uploaded successfully
  */
-router.post('/image', upload.single('file'), (req: Request, res: Response) => {
+router.post('/image', upload.single('file'), asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   if (!req.file) {
-    return res.status(400).json({ status: 'error', message: 'No file uploaded' });
+    return next(createError('No file uploaded', 400));
   }
   
   const fileUrl = `/uploads/${req.file.filename}`;
   return res.status(200).json({ status: 'success', url: fileUrl });
-});
+}));
 
 /**
  * @swagger
@@ -85,13 +86,13 @@ router.post('/image', upload.single('file'), (req: Request, res: Response) => {
  *       200:
  *         description: Audio uploaded successfully
  */
-router.post('/audio', upload.single('file'), (req: Request, res: Response) => {
+router.post('/audio', upload.single('file'), asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   if (!req.file) {
-    return res.status(400).json({ status: 'error', message: 'No file uploaded' });
+    return next(createError('No file uploaded', 400));
   }
   
   const fileUrl = `/uploads/${req.file.filename}`;
   return res.status(200).json({ status: 'success', url: fileUrl });
-});
+}));
 
 export default router;

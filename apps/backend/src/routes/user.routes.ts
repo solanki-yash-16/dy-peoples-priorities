@@ -1,6 +1,8 @@
 import express from "express";
 import { getAllUsers, getUserById, updateUser, deleteUser } from "../controllers/user.controller.js";
 import { protect } from "../middleware/auth.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { updateUserSchema } from "../schemas/user.schema.js";
 
 const router: express.Router = express.Router();
 
@@ -18,8 +20,33 @@ router.use(protect);
  * @swagger
  * /api/v1/users:
  *   get:
- *     summary: Get all users
+ *     summary: Get all users with filtering and pagination
  *     tags: [Users]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Items per page
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *         description: Sorting (e.g. -createdAt)
+ *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *           enum: [user, admin]
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: List of all users
@@ -81,7 +108,7 @@ router.get("/:id", getUserById);
  *       404:
  *         description: User not found
  */
-router.put("/:id", updateUser);
+router.put("/:id", validate(updateUserSchema), updateUser);
 
 /**
  * @swagger

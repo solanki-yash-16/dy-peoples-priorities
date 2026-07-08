@@ -5,12 +5,37 @@ import { asyncHandler, createError } from "../middleware/errorHandler.js";
 // @desc    Get all users
 // @route   GET /api/v1/users
 // @access  Private
-export const getAllUsers = asyncHandler(async (_req: Request, res: Response, _next: NextFunction) => {
-  const users = await User.find().select("-__v");
+export const getAllUsers = asyncHandler(async (req: Request, res: Response, _next: NextFunction) => {
+  const { page = 1, limit = 10, sort = '-createdAt', role, search } = req.query;
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = {};
+  if (role) query.role = String(role);
+  if (search) {
+    query.$or = [
+      { name: { $regex: String(search), $options: "i" } },
+      { email: { $regex: String(search), $options: "i" } },
+    ];
+  }
+
+  const users = await User.find(query)
+    .sort(String(sort))
+    .skip(skip)
+    .limit(Number(limit))
+    .select("-__v");
+
+  const total = await User.countDocuments(query);
 
   res.status(200).json({
     success: true,
-    count: users.length,
+    pagination: {
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      pages: Math.ceil(total / Number(limit)),
+    },
     users,
   });
 });

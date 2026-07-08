@@ -18,7 +18,7 @@ const complaintController = new ComplaintController();
  * /api/v1/complaints/stats:
  *   get:
  *     summary: Get complaint statistics
- *     tags: [Complaints, Dashboard]
+ *     tags: [Complaints]
  *     responses:
  *       200:
  *         description: Statistics retrieved successfully
@@ -30,7 +30,7 @@ router.get('/stats', complaintController.getStats);
  * /api/v1/complaints/heatmap:
  *   get:
  *     summary: Get complaint heatmap data
- *     tags: [Complaints, Dashboard, Location]
+ *     tags: [Complaints]
  *     responses:
  *       200:
  *         description: Heatmap data retrieved successfully
@@ -148,5 +148,56 @@ router.get('/:id', complaintController.getById);
  *         description: Status updated
  */
 router.patch('/:id/status', complaintController.updateStatus);
+
+/**
+ * @swagger
+ * /api/v1/complaints/{id}:
+ *   patch:
+ *     summary: Update complaint details
+ *     tags: [Complaints]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Complaint updated
+ *       404:
+ *         description: Complaint not found
+ */
+router.patch('/:id', complaintController.update);
+
+/**
+ * @swagger
+ * /api/v1/complaints/{id}:
+ *   delete:
+ *     summary: Delete a complaint
+ *     tags: [Complaints]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Complaint deleted
+ *       404:
+ *         description: Complaint not found
+ */
+router.delete('/:id', complaintController.delete);
 
 export default router;

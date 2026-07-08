@@ -53,3 +53,5 @@ coverage/
 apps/*/pnpm-lock.yaml
 packages/*/pnpm-lock.yaml
 packages/pnpm-lock.yaml
+
+.agents

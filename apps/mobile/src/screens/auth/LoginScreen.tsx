@@ -13,7 +13,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors, Spacing, Typography } from '../../theme';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuthStore } from '../../store/authStore';
+import { authApi } from '../../api/auth';
+import { storage } from '../../utils/storage';
+import { useMutation } from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
+import { loginSchema } from './validation';
 
 import type { RootStackParamList } from '../../navigation/types';
 
@@ -25,21 +30,47 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const { login, isLoading } = useAuth();
+  const [errors, setErrors] = useState<{
+    username?: string;
+    password?: string;
+  }>({});
+  const [globalError, setGlobalError] = useState('');
+  const setUser = useAuthStore(state => state.setUser);
+
+  const loginMutation = useMutation({
+    mutationFn: authApi.login,
+    onSuccess: async data => {
+      await storage.setToken(data.token);
+      setUser(data.user);
+      Toast.show({
+        type: 'success',
+        text1: 'Login Successful',
+        text2: 'Welcome back!',
+      });
+      // AppNavigator will automatically route to MainTabs since isAuthenticated is true
+    },
+    onError: (err: any) => {
+      setGlobalError(
+        err.response?.data?.message || 'Invalid username or password',
+      );
+    },
+  });
 
   const handleLogin = async () => {
-    if (!username.trim() || !password.trim()) {
-      setError('Please enter both username and password');
+    const result = loginSchema.safeParse({ username, password });
+
+    if (!result.success) {
+      const fieldErrors = result.error.formErrors.fieldErrors;
+      setErrors({
+        username: fieldErrors.username?.[0],
+        password: fieldErrors.password?.[0],
+      });
       return;
     }
 
-    const success = await login(username, password);
-    if (success) {
-      navigation.replace('MainTabs');
-    } else {
-      setError('Invalid username or password');
-    }
+    setErrors({});
+    setGlobalError('');
+    loginMutation.mutate({ email: username, password });
   };
 
   return (
@@ -65,48 +96,67 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           </View>
 
           <View style={styles.form}>
-            {error ? (
-              <Text style={styles.errorText}>{error}</Text>
-            ) : (
-              <Text>Error</Text>
-            )}
-
             <Input
               label="Username"
               placeholder="Enter username"
               value={username}
-              onChangeText={setUsername}
+              onChangeText={val => {
+                setUsername(val);
+                if (errors.username)
+                  setErrors(prev => ({ ...prev, username: undefined }));
+              }}
               autoCapitalize="none"
               autoCorrect={false}
+              error={errors.username}
             />
 
             <Input
               label="Password"
               placeholder="Enter password"
               value={password}
-              onChangeText={setPassword}
+              onChangeText={val => {
+                setPassword(val);
+                if (errors.password)
+                  setErrors(prev => ({ ...prev, password: undefined }));
+              }}
               secureTextEntry={!showPassword}
               autoCapitalize="none"
               autoCorrect={false}
+              error={errors.password}
               rightIcon={
                 <Text style={styles.eyeIcon}>{showPassword ? '👀' : '🙈'}</Text>
               }
               onRightIconPress={() => setShowPassword(!showPassword)}
             />
 
+            <View style={{ marginTop: Spacing.md }} />
+            {globalError ? (
+              <Text style={styles.errorText}>{globalError}</Text>
+            ) : null}
+
             <Button
               title="Sign In"
               onPress={handleLogin}
-              loading={isLoading}
-              disabled={isLoading}
+              loading={loginMutation.isPending}
+              disabled={loginMutation.isPending}
               size="lg"
               style={styles.loginButton}
             />
 
-            <View style={styles.demoContainer}>
+            <View style={styles.switchTextContainer}>
+              <Text
+                style={styles.switchText}
+                onPress={() => navigation.navigate('Register')}
+              >
+                Don't have an account?{' '}
+                <Text style={styles.switchTextHighlight}>Register</Text>
+              </Text>
+            </View>
+
+            {/* <View style={styles.demoContainer}>
               <Text style={styles.demoText}>Demo credentials:</Text>
               <Text style={styles.demoCredentials}>admin / admin123</Text>
-            </View>
+            </View> */}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -129,7 +179,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: Spacing.xxl,
+    marginBottom: Spacing.sm,
   },
   logoContainer: {
     width: 80,
@@ -184,5 +234,17 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     fontSize: 20,
+  },
+  switchTextContainer: {
+    marginTop: Spacing.xl,
+    alignItems: 'center',
+  },
+  switchText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.slate[400],
+  },
+  switchTextHighlight: {
+    color: Colors.accent,
+    fontWeight: Typography.weights.bold,
   },
 });

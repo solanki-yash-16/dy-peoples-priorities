@@ -34,7 +34,7 @@ export const Spacing = {
   lg: 24,
   xl: 32,
   xxl: 48,
-  tabBar: 100,
+  tabBar: 110,
 };
 
 export const Typography = {

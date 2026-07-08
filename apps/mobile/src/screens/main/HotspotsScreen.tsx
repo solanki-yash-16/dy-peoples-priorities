@@ -1,15 +1,18 @@
-import React, { useRef, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Colors, Spacing, BorderRadius, Typography } from "../../theme";
-import { Card } from "../../components/Card";
-import { mockHotspots } from "../../utils/mockData";
+import React, { useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
+import { Card } from '../../components/Card';
+import { TopTabBar } from '../../navigation/CustomTabBar';
+import { mockHotspots } from '../../utils/mockData';
 
 interface HotspotsScreenProps {
   navigation: any;
 }
 
-export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({ navigation }) => {
+export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({
+  navigation,
+}) => {
   const getSeverityColor = (score: number): string => {
     if (score >= 85) return Colors.error;
     if (score >= 70) return Colors.warning;
@@ -17,22 +20,23 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({ navigation }) =>
   };
 
   const getSeverityLabel = (score: number): string => {
-    if (score >= 85) return "Critical";
-    if (score >= 70) return "High";
-    return "Moderate";
+    if (score >= 85) return 'Critical';
+    if (score >= 70) return 'High';
+    return 'Moderate';
   };
 
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
+    const unsubscribe = navigation.addListener('focus', () => {
       scrollRef.current?.scrollTo({ y: 0, animated: false });
     });
     return unsubscribe;
   }, [navigation]);
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <TopTabBar navigation={navigation} />
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
@@ -52,7 +56,7 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({ navigation }) =>
         </View>
 
         <View style={styles.list}>
-          {mockHotspots.map((hotspot) => (
+          {mockHotspots.map(hotspot => (
             <Card key={hotspot.id} style={styles.card}>
               <View style={styles.cardHeader}>
                 <View style={styles.titleContainer}>
@@ -62,7 +66,10 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({ navigation }) =>
                 <View
                   style={[
                     styles.severityBadge,
-                    { backgroundColor: getSeverityColor(hotspot.demandScore) + "15" },
+                    {
+                      backgroundColor:
+                        getSeverityColor(hotspot.demandScore) + '15',
+                    },
                   ]}
                 >
                   <Text
@@ -86,7 +93,9 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({ navigation }) =>
                           styles.scoreBarFill,
                           {
                             width: `${hotspot.demandScore}%`,
-                            backgroundColor: getSeverityColor(hotspot.demandScore),
+                            backgroundColor: getSeverityColor(
+                              hotspot.demandScore,
+                            ),
                           },
                         ]}
                       />
@@ -98,17 +107,24 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({ navigation }) =>
 
               <View style={styles.statsRow}>
                 <View style={styles.statBox}>
-                  <Text style={styles.statValue}>{hotspot.submissionCount}</Text>
+                  <Text style={styles.statValue}>
+                    {hotspot.submissionCount}
+                  </Text>
                   <Text style={styles.statLabel}>Submissions</Text>
                 </View>
                 <View style={styles.statBox}>
                   <Text
                     style={[
                       styles.statValue,
-                      { color: hotspot.growthRate > 0 ? Colors.error : Colors.success },
+                      {
+                        color:
+                          hotspot.growthRate > 0
+                            ? Colors.error
+                            : Colors.success,
+                      },
                     ]}
                   >
-                    {hotspot.growthRate > 0 ? "+" : ""}
+                    {hotspot.growthRate > 0 ? '+' : ''}
                     {hotspot.growthRate}%
                   </Text>
                   <Text style={styles.statLabel}>Growth</Text>
@@ -129,10 +145,11 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.md,
+    // paddingTop: tabBarHeight + Spacing.md,
     paddingBottom: Spacing.tabBar,
   },
   title: {
-    fontSize: Typography.sizes.xxl,
+    fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
     color: Colors.text,
     marginBottom: Spacing.xs,
@@ -146,8 +163,8 @@ const styles = StyleSheet.create({
     height: 200,
     backgroundColor: Colors.slate[100],
     borderRadius: BorderRadius.lg,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: Spacing.lg,
     borderWidth: 1,
     borderColor: Colors.border,
@@ -170,12 +187,12 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   card: {
-    padding: Spacing.md,
+    // padding: Spacing.md,
   },
   cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: Spacing.md,
   },
   titleContainer: {
@@ -191,7 +208,7 @@ const styles = StyleSheet.create({
   topIssue: {
     fontSize: Typography.sizes.sm,
     color: Colors.textSecondary,
-    textTransform: "capitalize",
+    textTransform: 'capitalize',
   },
   severityBadge: {
     paddingHorizontal: Spacing.sm,
@@ -219,10 +236,10 @@ const styles = StyleSheet.create({
     height: 8,
     backgroundColor: Colors.slate[200],
     borderRadius: 4,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   scoreBarFill: {
-    height: "100%",
+    height: '100%',
     borderRadius: 4,
   },
   scoreValue: {
@@ -231,7 +248,7 @@ const styles = StyleSheet.create({
     color: Colors.text,
   },
   statsRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: Spacing.md,
     paddingTop: Spacing.sm,
     borderTopWidth: 1,
@@ -241,7 +258,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statValue: {
-    fontSize: Typography.sizes.xl,
+    fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.bold,
     color: Colors.text,
   },

@@ -65,7 +65,7 @@ export const Input: React.FC<InputProps> = ({
 
     const sizeStyles: Record<string, ViewStyle> = {
       sm: { paddingHorizontal: Spacing.sm, paddingVertical: Spacing.sm, minHeight: 40 },
-      md: { paddingHorizontal: Spacing.md, paddingVertical: Spacing.md, minHeight: 48 },
+      md: { paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, minHeight: 48 },
       lg: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.lg, minHeight: 56 },
     };
 

@@ -1,47 +1,36 @@
-import { useState, useCallback } from "react";
-import { APP_CONSTANTS } from "../utils/constants";
-
-export interface AuthState {
-  isAuthenticated: boolean;
-  user: { username: string; role: string } | null;
-  isLoading: boolean;
-}
+import { useCallback } from "react";
+import { useAuthStore } from "../store/authStore";
+import { authApi } from "../api/auth";
+import { storage } from "../utils/storage";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Toast from "react-native-toast-message";
 
 export const useAuth = () => {
-  const [state, setState] = useState<AuthState>({
-    isAuthenticated: false,
-    user: null,
-    isLoading: false,
+  const { isAuthenticated, user, isInitializing, logout: storeLogout } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  const logoutMutation = useMutation({
+    mutationFn: authApi.logout,
+    onSettled: async () => {
+      await storage.removeToken();
+      storeLogout();
+      queryClient.clear();
+      Toast.show({
+        type: 'success',
+        text1: 'Logged Out',
+        text2: 'You have been successfully logged out',
+      });
+    }
   });
 
-  const login = useCallback(async (username: string, password: string): Promise<boolean> => {
-    setState((prev) => ({ ...prev, isLoading: true }));
-
-    await new Promise<void>((resolve) => setTimeout(() => resolve(), 800));
-
-    if (
-      username === APP_CONSTANTS.STATIC_CREDENTIALS.username &&
-      password === APP_CONSTANTS.STATIC_CREDENTIALS.password
-    ) {
-      setState({
-        isAuthenticated: true,
-        user: { username, role: "admin" },
-        isLoading: false,
-      });
-      return true;
-    }
-
-    setState((prev) => ({ ...prev, isLoading: false }));
-    return false;
-  }, []);
-
   const logout = useCallback(() => {
-    setState({
-      isAuthenticated: false,
-      user: null,
-      isLoading: false,
-    });
-  }, []);
+    logoutMutation.mutate();
+  }, [logoutMutation]);
 
-  return { ...state, login, logout };
+  return {
+    isAuthenticated,
+    user,
+    isLoading: isInitializing || logoutMutation.isPending,
+    logout
+  };
 };
