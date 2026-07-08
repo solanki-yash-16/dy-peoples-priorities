@@ -1,19 +1,22 @@
-import React, { useRef, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Colors, Spacing, BorderRadius, Typography } from "../../theme";
-import { Card } from "../../components/Card";
-import { mockInsights } from "../../utils/mockData";
+import React, { useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
+import { Card } from '../../components/Card';
+import { TopTabBar } from '../../navigation/CustomTabBar';
+import { mockInsights } from '../../utils/mockData';
 
 interface InsightsScreenProps {
   navigation: any;
 }
 
-export const InsightsScreen: React.FC<InsightsScreenProps> = ({ navigation }) => {
+export const InsightsScreen: React.FC<InsightsScreenProps> = ({
+  navigation,
+}) => {
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
+    const unsubscribe = navigation.addListener('focus', () => {
       scrollRef.current?.scrollTo({ y: 0, animated: false });
     });
     return unsubscribe;
@@ -21,13 +24,13 @@ export const InsightsScreen: React.FC<InsightsScreenProps> = ({ navigation }) =>
 
   const getInsightColor = (type: string): string => {
     switch (type) {
-      case "correlation":
+      case 'correlation':
         return Colors.accent;
-      case "anomaly":
+      case 'anomaly':
         return Colors.warning;
-      case "prediction":
-        return "#8b5cf6";
-      case "recommendation":
+      case 'prediction':
+        return '#8b5cf6';
+      case 'recommendation':
         return Colors.success;
       default:
         return Colors.textSecondary;
@@ -36,21 +39,22 @@ export const InsightsScreen: React.FC<InsightsScreenProps> = ({ navigation }) =>
 
   const getInsightIcon = (type: string): string => {
     switch (type) {
-      case "correlation":
-        return "📈";
-      case "anomaly":
-        return "⚠️";
-      case "prediction":
-        return "🔮";
-      case "recommendation":
-        return "💡";
+      case 'correlation':
+        return '📈';
+      case 'anomaly':
+        return '⚠️';
+      case 'prediction':
+        return '🔮';
+      case 'recommendation':
+        return '💡';
       default:
-        return "📊";
+        return '📊';
     }
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <TopTabBar navigation={navigation} />
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
@@ -62,21 +66,23 @@ export const InsightsScreen: React.FC<InsightsScreenProps> = ({ navigation }) =>
         </Text>
 
         <View style={styles.list}>
-          {mockInsights.map((insight) => (
+          {mockInsights.map(insight => (
             <Card key={insight.id} style={styles.card}>
               <View style={styles.cardHeader}>
                 <View
                   style={[
                     styles.iconContainer,
-                    { backgroundColor: getInsightColor(insight.type) + "15" },
+                    { backgroundColor: getInsightColor(insight.type) + '15' },
                   ]}
                 >
-                  <Text style={styles.icon}>{getInsightIcon(insight.type)}</Text>
+                  <Text style={styles.icon}>
+                    {getInsightIcon(insight.type)}
+                  </Text>
                 </View>
                 <View
                   style={[
                     styles.typeBadge,
-                    { backgroundColor: getInsightColor(insight.type) + "15" },
+                    { backgroundColor: getInsightColor(insight.type) + '15' },
                   ]}
                 >
                   <Text
@@ -135,16 +141,17 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.md,
+    // paddingTop: tabBarHeight + Spacing.md,
     paddingBottom: Spacing.tabBar,
   },
   title: {
-    fontSize: Typography.sizes.xxl,
+    fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
     color: Colors.text,
     marginBottom: Spacing.xs,
   },
   subtitle: {
-    fontSize: Typography.sizes.md,
+    fontSize: Typography.sizes.sm,
     color: Colors.textSecondary,
     marginBottom: Spacing.lg,
   },
@@ -152,20 +159,20 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   card: {
-    padding: Spacing.md,
+    // padding: Spacing.md,
   },
   cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: Spacing.md,
   },
   iconContainer: {
     width: 44,
     height: 44,
     borderRadius: BorderRadius.md,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   icon: {
     fontSize: 22,
@@ -178,7 +185,7 @@ const styles = StyleSheet.create({
   typeText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.semibold,
-    textTransform: "capitalize",
+    textTransform: 'capitalize',
   },
   cardTitle: {
     fontSize: Typography.sizes.lg,
@@ -199,8 +206,8 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
   },
   confidenceContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.sm,
   },
   confidenceLabel: {
@@ -213,10 +220,10 @@ const styles = StyleSheet.create({
     height: 6,
     backgroundColor: Colors.slate[200],
     borderRadius: 3,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   confidenceFill: {
-    height: "100%",
+    height: '100%',
     borderRadius: 3,
   },
   confidenceValue: {
@@ -224,11 +231,11 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.semibold,
     color: Colors.text,
-    textAlign: "right",
+    textAlign: 'right',
   },
   relatedContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.sm,
   },
   relatedLabel: {
@@ -244,6 +251,6 @@ const styles = StyleSheet.create({
   relatedText: {
     fontSize: Typography.sizes.xs,
     color: Colors.textSecondary,
-    fontFamily: "monospace",
+    fontFamily: 'monospace',
   },
 });

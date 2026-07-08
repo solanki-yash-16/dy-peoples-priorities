@@ -11,13 +11,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
 import {
   mockRankings,
-  mockSubmissions,
   mockThemes,
-  mockHotspots,
 } from '../../utils/mockData';
 import { Card } from '../../components/Card';
-import { categoryColors, sentimentColors } from '../../utils/mockData';
+import { TopTabBar } from '../../navigation/CustomTabBar';
+import { categoryColors } from '../../utils/mockData';
 import { FloatingActionButton } from '../../components/FloatingActionButton';
+import { useAuthStore } from '../../store/authStore';
+import { useQuery } from '@tanstack/react-query';
+import { complaintApi } from '../../api/complaint';
+import { ComplaintCard } from '../../components/ComplaintCard';
 const { width } = Dimensions.get('window');
 
 interface StatCardProps {
@@ -47,7 +50,20 @@ interface HomeScreenProps {
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const recentSubmissions = mockSubmissions.slice(0, 3);
+  const { user } = useAuthStore();
+  
+  const { data: recentComplaintsData, isLoading: isLoadingComplaints } = useQuery({
+    queryKey: ['complaints', 'recent'],
+    queryFn: () => complaintApi.getComplaints({ page: 1, limit: 3, sort: '-createdAt' }),
+  });
+  
+  const { data: heatmapData, isLoading: isLoadingHeatmap } = useQuery({
+    queryKey: ['heatmap'],
+    queryFn: () => complaintApi.getHeatmap(),
+  });
+  
+  const recentSubmissions = (recentComplaintsData?.data || []).slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const hotspotsCount = heatmapData?.data?.length || 0;
   const topRankings = mockRankings.slice(0, 2);
 
   const scrollRef = useRef<ScrollView>(null);
@@ -61,6 +77,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <TopTabBar navigation={navigation} />
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
@@ -69,10 +86,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>Welcome back,</Text>
-            <Text style={styles.title}>MP Admin</Text>
+            <Text style={styles.title}>{user?.name || 'User'}</Text>
           </View>
           <TouchableOpacity style={styles.avatar}>
-            <Text style={styles.avatarText}>A</Text>
+            <Text style={styles.avatarText}>{user?.name?.[0]?.toUpperCase() || 'U'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -81,8 +98,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <View style={styles.statsGrid}>
             <StatCard
               title="Submissions"
-              value={mockSubmissions.length.toString()}
-              subtitle="+12% from last month"
+              value={recentComplaintsData?.data.length.toString() ?? ""}
+              subtitle="Data collection" //
               color={Colors.accent}
             />
             <StatCard
@@ -93,7 +110,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             />
             <StatCard
               title="Hotspots"
-              value={mockHotspots.length.toString()}
+              value={isLoadingHeatmap ? '...' : hotspotsCount.toString()}
               subtitle="High urgency areas"
               color={Colors.warning}
             />
@@ -184,49 +201,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               <Text style={styles.seeAll}>See all</Text>
             </TouchableOpacity>
           </View>
-          {recentSubmissions.map(submission => (
-            <Card key={submission.id} style={styles.submissionCard}>
-              <View style={styles.submissionHeader}>
-                <Text style={styles.submissionTitle} numberOfLines={2}>
-                  {submission.title}
-                </Text>
-                <View
-                  style={[
-                    styles.sentimentBadge,
-                    {
-                      backgroundColor:
-                        (sentimentColors[submission.sentiment] ||
-                          Colors.slate[200]) + '20',
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.sentimentText,
-                      {
-                        color:
-                          sentimentColors[submission.sentiment] ||
-                          Colors.textSecondary,
-                      },
-                    ]}
-                  >
-                    {submission.sentiment}
-                  </Text>
-                </View>
-              </View>
-              <Text style={styles.submissionDescription} numberOfLines={2}>
-                {submission.description}
-              </Text>
-              <View style={styles.submissionMeta}>
-                <Text style={styles.submissionMetaText}>
-                  {submission.region}
-                </Text>
-                <Text style={styles.submissionMetaText}>
-                  👍 {submission.upvotes}
-                </Text>
-              </View>
-            </Card>
-          ))}
+          {isLoadingComplaints ? (
+            <Text style={styles.greeting}>Loading recent submissions...</Text>
+          ) : recentSubmissions.length > 0 ? (
+            recentSubmissions.map(submission => (
+              <ComplaintCard key={submission._id} complaint={submission} />
+            ))
+          ) : (
+            <Text style={styles.greeting}>No submissions yet.</Text>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -275,6 +258,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.md,
+    // paddingTop: tabBarHeight + Spacing.md,
     paddingBottom: Spacing.tabBar,
   },
   header: {
@@ -318,7 +302,7 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
     color: Colors.text,
-    marginBottom: 10
+    marginBottom: 10,
   },
   seeAll: {
     fontSize: Typography.sizes.sm,
@@ -332,7 +316,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: (width - Spacing.md * 2 - Spacing.sm) / 2,
-    padding: Spacing.md,
+    // padding: Spacing.md,
     backgroundColor: Colors.white,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
@@ -344,7 +328,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xs,
   },
   statValue: {
-    fontSize: Typography.sizes.xxl,
+    fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.bold,
     color: Colors.text,
     marginBottom: Spacing.xs,
@@ -355,7 +339,7 @@ const styles = StyleSheet.create({
   },
   projectCard: {
     marginBottom: Spacing.sm,
-    padding: Spacing.md,
+    // padding: Spacing.md,
   },
   projectHeader: {
     flexDirection: 'row',
@@ -388,7 +372,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scoreValue: {
-    fontSize: Typography.sizes.lg,
+    fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.bold,
     color: Colors.accent,
   },
@@ -417,7 +401,7 @@ const styles = StyleSheet.create({
   },
   submissionCard: {
     marginBottom: Spacing.sm,
-    padding: Spacing.md,
+    // padding: Spacing.md,
   },
   submissionHeader: {
     flexDirection: 'row',
@@ -461,6 +445,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing.sm,
+    marginBottom: 10
   },
   quickCard: {
     flex: 1,
