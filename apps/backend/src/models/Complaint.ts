@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IComplaint } from '../interfaces/complaint.interface';
+import type { IComplaint } from '../interfaces/complaint.interface';
 
 const ComplaintSchema = new Schema<IComplaint>({
   userId: { type: String, required: true }, // Referencing the user submitting the complaint
