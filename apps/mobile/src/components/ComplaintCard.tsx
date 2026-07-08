@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Colors, Spacing, Typography } from '../theme';
 import { Card } from './Card';
 import { Complaint, complaintApi } from '../api/complaint';
@@ -39,6 +39,40 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
       });
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => complaintApi.deleteComplaint(_id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['complaints'] });
+      Toast.show({
+        type: 'success',
+        text1: 'Deleted',
+        text2: 'Complaint was successfully deleted.',
+      });
+    },
+    onError: () => {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to delete complaint.',
+      });
+    },
+  });
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Complaint',
+      'Are you sure you want to delete this complaint? This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Delete', 
+          style: 'destructive', 
+          onPress: () => deleteMutation.mutate() 
+        },
+      ]
+    );
+  };
 
   let timeAgo = '';
   try {
@@ -107,6 +141,13 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
               📎 {media.length} Attachment{media.length > 1 ? 's' : ''}
             </Text>
           )}
+          <TouchableOpacity 
+            onPress={handleDelete}
+            style={styles.deleteButton}
+            disabled={deleteMutation.isPending}
+          >
+            <Text style={styles.deleteIcon}>🗑️</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Card>
@@ -166,5 +207,12 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     color: Colors.accent,
     fontWeight: Typography.weights.medium,
+  },
+  deleteButton: {
+    padding: Spacing.xs,
+    marginLeft: Spacing.sm,
+  },
+  deleteIcon: {
+    fontSize: Typography.sizes.lg,
   },
 });

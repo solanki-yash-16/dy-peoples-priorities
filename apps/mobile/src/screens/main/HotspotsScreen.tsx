@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
@@ -35,56 +35,85 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({
 
   const scrollRef = useRef<ScrollView>(null);
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      scrollRef.current?.scrollTo({ y: 0, animated: false });
-    });
-    return unsubscribe;
-  }, [navigation]);
-
-  const generateLeafletHtml = () => {
+  const mapHtml = useMemo(() => {
     const points = heatmapData?.data || [];
-    const centerLat = points[0]?.lat || 28.6139;
-    const centerLng = points[0]?.lng || 77.209;
 
-    const markersCode = points
-      .map(
-        (p: any) =>
-          `L.marker([${p.lat}, ${p.lng}], {icon: redIcon}).addTo(map);`
-      )
-      .join('\\n');
+    if (!points.length) {
+      return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+          <style>
+            html, body, #map { height: 100%; margin: 0; padding: 0; background: #e2e8f0; }
+            .empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #475569; font-family: -apple-system, Roboto, sans-serif; font-size: 14px; text-align: center; padding: 24px; }
+          </style>
+        </head>
+        <body>
+          <div id="map">
+            <div class="empty">No location data available yet.</div>
+          </div>
+        </body>
+        </html>
+      `;
+    }
+
+    const pointsJson = JSON.stringify(
+      points.map(p => ({
+        type: 'Feature',
+        properties: {},
+        geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
+      }))
+    );
 
     return `
       <!DOCTYPE html>
       <html>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
         <style>
-          body { padding: 0; margin: 0; }
-          html, body, #map { height: 100%; width: 100%; }
+          html, body, #map { height: 100%; margin: 0; padding: 0; }
         </style>
-      </head>
-      <body>
-        <div id="map"></div>
         <script>
-          var map = L.map('map', { zoomControl: false }).setView([${centerLat}, ${centerLng}], 10);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OSM'
-          }).addTo(map);
-          var redIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
-          });
-          ${markersCode}
+          function initMap() {
+            if (typeof L === 'undefined') {
+              setTimeout(initMap, 100);
+              return;
+            }
+            var map = L.map('map', { zoomControl: false });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; OpenStreetMap contributors',
+              maxZoom: 19
+            }).addTo(map);
+            var geoJson = ${pointsJson};
+            var markers = L.geoJSON(geoJson, {
+              pointToLayer: function(feature, latlng) {
+                return L.marker(latlng).bindPopup('Location');
+              }
+            }).addTo(map);
+            if (markers.getLayers().length > 1) {
+              map.fitBounds(markers.getBounds().pad(0.2));
+            } else if (markers.getLayers().length === 1) {
+              map.setView(markers.getBounds().getCenter(), 10);
+            }
+          }
         </script>
+      </head>
+      <body onload="initMap()">
+        <div id="map"></div>
       </body>
       </html>
     `;
-  };
+  }, [heatmapData]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      scrollRef.current?.scrollTo({ y: 0, animated: false });
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -101,13 +130,24 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({
 
         <View style={styles.mapContainer}>
           {isLoadingHeatmap ? (
-            <Text style={styles.mapText}>Loading Map...</Text>
+            <View style={styles.mapLoading}>
+              <Text style={styles.mapText}>Loading Map...</Text>
+            </View>
           ) : (
             <WebView
               originWhitelist={['*']}
-              source={{ html: generateLeafletHtml() }}
-              style={{ width: '100%', height: '100%' }}
+              source={{ html: mapHtml }}
+              style={styles.map}
               scrollEnabled={false}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              startInLoadingState={false}
+              onError={() => (
+                <View style={styles.mapLoading}>
+                  <Text style={styles.mapText}>Failed to load map</Text>
+                  <Text style={styles.mapSubtext}>Check your internet connection</Text>
+                </View>
+              )}
             />
           )}
         </View>
@@ -217,29 +257,41 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   mapContainer: {
-    height: 250,
-    backgroundColor: Colors.slate[100],
+    height: 280,
     borderRadius: BorderRadius.lg,
     overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: Spacing.lg,
     borderWidth: 1,
     borderColor: Colors.border,
+    backgroundColor: Colors.slate[200],
   },
-  mapIcon: {
-    fontSize: 40,
-    marginBottom: Spacing.sm,
+  map: {
+    height: 280,
+    width: '100%',
+  },
+  mapLoading: {
+    position: 'absolute',
+    inset: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.md,
+    backgroundColor: Colors.slate[200],
   },
   mapText: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
     color: Colors.text,
     marginBottom: Spacing.xs,
+    textAlign: 'center',
+  },
+  mapIcon: {
+    fontSize: 40,
+    marginBottom: Spacing.sm,
   },
   mapSubtext: {
     fontSize: Typography.sizes.sm,
     color: Colors.textSecondary,
+    textAlign: 'center',
   },
   list: {
     gap: Spacing.sm,
@@ -326,3 +378,4 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xs,
   },
 });
+

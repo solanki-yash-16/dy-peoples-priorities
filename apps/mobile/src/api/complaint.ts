@@ -127,5 +127,10 @@ export const complaintApi = {
       },
     });
     return response.data;
+  },
+
+  deleteComplaint: async (id: string) => {
+    const response = await api.delete(`/complaints/${id}`);
+    return response.data;
   }
 };
