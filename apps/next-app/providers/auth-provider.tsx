@@ -32,12 +32,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           // If we have a token, fetch the user profile
           const res = await authService.getMe();
+          if (res.data.role !== 'admin') {
+            throw new Error('Access denied. Admin privileges required.');
+          }
           setUser(res.data);
         } catch (error) {
           console.error('Failed to authenticate:', error);
           Cookies.remove('token');
           setToken(null);
           setUser(null);
+          if (error instanceof Error && error.message.includes('Access denied')) {
+            toast.error(error.message);
+          }
         }
       }
       setIsLoading(false);
@@ -53,13 +59,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.token) {
         Cookies.set('token', res.token, { expires: 7 }); // Store in cookie for 7 days
         setToken(res.token);
-        // We could fetch getMe here, but for now we just wait for the reload or set it if returned
-        toast.success('Logged in successfully!');
         
         // After login, fetch the user immediately
         const userRes = await authService.getMe();
-        setUser(userRes.data);
+        if (userRes.data.role !== 'admin') {
+          Cookies.remove('token');
+          setToken(null);
+          setUser(null);
+          throw { response: { data: { message: 'Access denied. Admin privileges required.' } } };
+        }
         
+        setUser(userRes.data);
+        toast.success('Logged in successfully!');
         window.location.href = '/';
       }
     } catch (error) {
@@ -79,6 +90,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setToken(res.token);
         
         const userRes = await authService.getMe();
+        if (userRes.data.role !== 'admin') {
+          Cookies.remove('token');
+          setToken(null);
+          setUser(null);
+          throw { response: { data: { message: 'Registration successful, but admin privileges are required to access this dashboard.' } } };
+        }
+
         setUser(userRes.data);
         
         toast.success('Registered successfully!');
