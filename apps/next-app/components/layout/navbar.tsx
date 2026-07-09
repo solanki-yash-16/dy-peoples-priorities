@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { Bell, Search, Menu } from 'lucide-react';
+import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -46,6 +47,7 @@ export function Navbar() {
           </form>
         </div>
         <div className="flex items-center gap-x-4 lg:gap-x-6">
+          <ThemeSwitcher />
           <button type="button" className="-m-2.5 p-2.5 text-muted-foreground hover:text-foreground">
             <span className="sr-only">View notifications</span>
             <Bell className="h-5 w-5" aria-hidden="true" />

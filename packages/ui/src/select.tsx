@@ -1,6 +1,8 @@
 import * as React from "react"
 import { cn } from "./lib/utils"
 
+import { ChevronDown } from "lucide-react"
+
 export interface SelectProps
   extends React.SelectHTMLAttributes<HTMLSelectElement> {
   options: { label: string; value: string }[];
@@ -9,23 +11,28 @@ export interface SelectProps
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, options, ...props }, ref) => {
     return (
-      <select
-        className={cn(
-          "flex h-12 w-full appearance-none rounded-md border border-zinc-300 bg-zinc-50/50 px-3 py-2 text-sm ring-offset-background placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:border-transparent focus-visible:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-950/50 dark:ring-offset-zinc-950 dark:placeholder:text-zinc-400 transition-all duration-200",
-          className
-        )}
-        ref={ref}
-        {...props}
-      >
-        <option value="" disabled hidden>
-          Select an option
-        </option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
+      <div className="relative w-full">
+        <select
+          className={cn(
+            "flex h-12 w-full appearance-none rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-transparent focus-visible:bg-background disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer transition-all duration-200",
+            className
+          )}
+          ref={ref}
+          {...props}
+        >
+          <option value="" disabled hidden>
+            Select an option
           </option>
-        ))}
-      </select>
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+          <ChevronDown className="h-4 w-4 text-muted-foreground opacity-70" />
+        </div>
+      </div>
     )
   }
 )
