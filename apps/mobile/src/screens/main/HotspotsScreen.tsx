@@ -115,6 +115,16 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({
     return unsubscribe;
   }, [navigation]);
 
+  const renderMapError = React.useCallback(
+    () => (
+      <View style={styles.mapLoading}>
+        <Text style={styles.mapText}>Failed to load map</Text>
+        <Text style={styles.mapSubtext}>Check your internet connection</Text>
+      </View>
+    ),
+    []
+  );
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <TopTabBar navigation={navigation} />
@@ -142,12 +152,7 @@ export const HotspotsScreen: React.FC<HotspotsScreenProps> = ({
               javaScriptEnabled={true}
               domStorageEnabled={true}
               startInLoadingState={false}
-              onError={() => (
-                <View style={styles.mapLoading}>
-                  <Text style={styles.mapText}>Failed to load map</Text>
-                  <Text style={styles.mapSubtext}>Check your internet connection</Text>
-                </View>
-              )}
+              renderError={renderMapError}
             />
           )}
         </View>

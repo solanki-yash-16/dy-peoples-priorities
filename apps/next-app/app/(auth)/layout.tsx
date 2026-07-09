@@ -1,5 +1,6 @@
 import React from 'react';
 import { Command, ShieldCheck, MapPin } from 'lucide-react';
+import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -59,7 +60,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       {/* Right Pane - Form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center p-8 sm:p-12">
+      <div className="flex w-full lg:w-1/2 items-center justify-center p-8 sm:p-12 relative">
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
+          <ThemeSwitcher />
+        </div>
         <div className="w-full max-w-[420px]">
           {children}
         </div>

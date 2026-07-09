@@ -112,7 +112,7 @@ export default function DashboardOverview() {
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
               <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Complaints</CardTitle>
-              <div className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm group-hover:scale-110 transition-transform duration-300">
+              <div className="p-2.5 rounded-full bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 shadow-sm group-hover:scale-110 transition-transform duration-300">
                 <Activity className="h-4 w-4" />
               </div>
             </CardHeader>
@@ -128,7 +128,7 @@ export default function DashboardOverview() {
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
               <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pending</CardTitle>
-              <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 shadow-sm group-hover:scale-110 transition-transform duration-300">
+              <div className="p-2.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 shadow-sm group-hover:scale-110 transition-transform duration-300">
                 <AlertCircle className="h-4 w-4" />
               </div>
             </CardHeader>
@@ -142,7 +142,7 @@ export default function DashboardOverview() {
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
               <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resolved</CardTitle>
-              <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 shadow-sm group-hover:scale-110 transition-transform duration-300">
+              <div className="p-2.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm group-hover:scale-110 transition-transform duration-300">
                 <CheckCircle className="h-4 w-4" />
               </div>
             </CardHeader>
@@ -156,7 +156,7 @@ export default function DashboardOverview() {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
               <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">In Progress</CardTitle>
-              <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 shadow-sm group-hover:scale-110 transition-transform duration-300">
+              <div className="p-2.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-sm group-hover:scale-110 transition-transform duration-300">
                 <TrendingUp className="h-4 w-4" />
               </div>
             </CardHeader>
